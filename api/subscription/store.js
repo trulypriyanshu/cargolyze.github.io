@@ -1,4 +1,3 @@
-// /api/subscription/store.js
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -7,25 +6,35 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY;
 
-// CORS headers configuration
-const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://cargolyze.com',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Allow-Credentials': 'true',
-  'Access-Control-Max-Age': '86400',
-};
+const allowedOrigins = [
+  'https://cargolyze.com',
+  'https://www.cargolyze.com',
+  'http://localhost:3000',
+  'http://localhost:5500',
+  'http://127.0.0.1:5500'
+];
 
 export default async function handler(req, res) {
-  // Handle OPTIONS request (preflight)
+  // Handle preflight request
   if (req.method === 'OPTIONS') {
-    return res.status(200).setHeaders(corsHeaders).end();
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    return res.status(200).end();
   }
 
-  // Set CORS headers for all responses
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    res.setHeader(key, value);
-  });
+  // Set CORS headers for actual request
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -38,17 +47,16 @@ export default async function handler(req, res) {
       email,
       price_id,
       plan_name,
-      customer_name  // Add this parameter from checkout
+      customer_name
     } = req.body;
 
     if (!transaction_id || !email) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Step 1: Get user name from profiles table using anon key
+    // Get user name from profiles table
     let userName = customer_name || 'Customer';
     
-    // Try to get name from profiles table
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('full_name')
@@ -57,14 +65,10 @@ export default async function handler(req, res) {
     
     if (!profileError && profile && profile.full_name) {
       userName = profile.full_name;
-    } else {
-      // If no profile exists, try to get from auth.users using admin API
-      // Note: This requires service role key, so use a different approach
-      // For now, use the provided customer_name or 'Customer'
     }
 
-    // Step 2: Get transaction details from Paddle (using server-side API)
-    const transactionResponse = await fetch('https://api.paddle.com/transactions', {
+    // Get transaction details from Paddle
+    const transactionResponse = await fetch(`https://api.paddle.com/transactions/${transaction_id}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${PADDLE_API_KEY}`,
@@ -72,21 +76,26 @@ export default async function handler(req, res) {
       }
     });
 
-    const transactionsData = await transactionResponse.json();
-    const transaction = transactionsData.data.find(t => t.id === transaction_id);
+    if (!transactionResponse.ok) {
+      console.error('Paddle transaction API error:', await transactionResponse.text());
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    const transactionData = await transactionResponse.json();
+    const transaction = transactionData.data;
     
     if (!transaction) {
       return res.status(404).json({ error: 'Transaction not found' });
     }
 
-    // Step 3: Get subscription ID from transaction
+    // Get subscription ID from transaction
     const subscriptionId = transaction.subscription_id;
     
     if (!subscriptionId) {
       return res.status(400).json({ error: 'No subscription found in transaction' });
     }
 
-    // Step 4: Get subscription details from Paddle
+    // Get subscription details from Paddle
     const subscriptionResponse = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}`, {
       method: 'GET',
       headers: {
@@ -95,13 +104,18 @@ export default async function handler(req, res) {
       }
     });
 
+    if (!subscriptionResponse.ok) {
+      console.error('Paddle subscription API error:', await subscriptionResponse.text());
+      return res.status(404).json({ error: 'Subscription not found' });
+    }
+
     const subscriptionData = await subscriptionResponse.json();
     const subscription = subscriptionData.data;
 
-    // Step 5: Store subscription in database
+    // Store subscription in database
     const subscriptionRecord = {
       user_email: email,
-      user_name: userName,  // Store name for quick access
+      user_name: userName,
       subscription_id: subscription.id,
       transaction_id: transaction_id,
       paddle_customer_id: customer_id || subscription.customer_id,

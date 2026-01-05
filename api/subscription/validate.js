@@ -1,29 +1,38 @@
-// /api/subscription/validate.js
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// CORS headers configuration
-const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://cargolyze.com',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Allow-Credentials': 'true',
-  'Access-Control-Max-Age': '86400',
-};
+const allowedOrigins = [
+  'https://cargolyze.com',
+  'https://www.cargolyze.com',
+  'http://localhost:3000',
+  'http://localhost:5500',
+  'http://127.0.0.1:5500'
+];
 
 export default async function handler(req, res) {
-  // Handle OPTIONS request (preflight)
+  // Handle preflight request
   if (req.method === 'OPTIONS') {
-    return res.status(200).setHeaders(corsHeaders).end();
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    return res.status(200).end();
   }
 
-  // Set CORS headers for all responses
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    res.setHeader(key, value);
-  });
+  // Set CORS headers for actual request
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -36,7 +45,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Email is required' });
     }
 
-    // Step 1: Get user's name from profiles table
+    // Get user's name from profiles table
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('full_name, id')
@@ -48,7 +57,7 @@ export default async function handler(req, res) {
       userName = profile.full_name;
     }
 
-    // Step 2: Get user's active subscriptions
+    // Get user's active subscriptions
     const { data: subscriptions, error: subscriptionError } = await supabase
       .from('subscriptions')
       .select('*')
@@ -61,7 +70,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to fetch subscriptions' });
     }
 
-    // Step 3: Check if any subscription is currently valid
+    // Check if any subscription is currently valid
     const now = new Date();
     let activeSubscription = null;
 
@@ -86,7 +95,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Step 4: Return subscription details
+    // Return subscription details
     return res.json({
       valid: true,
       subscription: {
