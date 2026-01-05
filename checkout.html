@@ -1251,17 +1251,16 @@ case 'checkout.completed':
   console.log('Checkout completed!', event.data);
   
   if (event.data && event.data.id) {
-    const transactionId = event.data.id;
-    const customerId = event.data.customer?.id;
-    const customerEmail = event.data.customer?.email;
-    const customerName = event.data.customer?.name || event.data.customer?.business;
+    const transactionId = event.data.transaction_id;
+    const customerId = event.data.customer.id;
+    const customerEmail = event.data.customer.email;
     
     // Get user data from localStorage
     const userData = localStorage.getItem('cargolyze_user');
     const user = userData ? JSON.parse(userData) : null;
     
     const email = customerEmail || (user ? user.email : null);
-    const name = customerName || (user ? user.name : null);
+    const name = user ? user.name : null;
     
     if (email && transactionId) {
       // Call API to store subscription data
@@ -2505,7 +2504,7 @@ function showSuccessWithCountdown() {
   }
   
   // Start the countdown
-  startCountdown(50);
+  startCountdown(100);
 }
 
 function startCountdown(seconds) {
