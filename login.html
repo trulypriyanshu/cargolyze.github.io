@@ -999,7 +999,7 @@ document.querySelector('.google-button').addEventListener('click', async () => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${window.location.origin}/account.html`,
+                redirectTo: `${window.location.origin}/index.html`,
                 queryParams: {
                     access_type: 'offline',
                     prompt: 'consent'
@@ -1066,7 +1066,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         
         // Redirect to dashboard
         setTimeout(() => {
-            window.location.href = 'account.html';
+            handleRedirectAfterLogin();
         }, 1500);
         
     } catch (error) {
@@ -1130,7 +1130,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
                     full_name: company,
                     user_type: 'user'
                 },
-                emailRedirectTo: `${window.location.origin}/account.html`
+                emailRedirectTo: `${window.location.origin}/index.html`
             }
         });
         
@@ -1270,13 +1270,34 @@ async function checkUserAndRedirect() {
         }
         
         // Both localStorage and Supabase session are valid
-        console.log('✅ User already logged in, redirecting to dashboard');
-        window.location.href = 'account.html';
+        console.log('✅ User already logged in, redirecting...');
+        handleRedirectAfterLogin();
         
     } catch (error) {
         console.error('Error checking user:', error);
         localStorage.removeItem('cargolyze_user');
     }
+}
+
+// ========== REDIRECT HANDLING ==========
+function handleRedirectAfterLogin() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const redirectParam = urlParams.get('redirect');
+  console.log(redirectParam);
+  
+  // Check for checkout intent
+  const checkoutIntent = localStorage.getItem('checkout_intent');
+  console.log(checkoutIntent);  
+
+  if (redirectParam === 'checkout' && checkoutIntent) {
+    console.log('User needs to complete checkout');
+    window.location.href = 'pricing.html?redirect=checkout';
+  }
+  
+  // Default redirect to dashboard after login
+  if (redirectParam === 'dashboard') {
+    window.location.href = 'dashboard.html';
+  }
 }
 
 // ========== NOTIFY LOGIN FUNCTION ==========
@@ -1293,7 +1314,7 @@ function notifyLogin(userData) {
 window.addEventListener('message', function(event) {
     if (event.data === 'userLoggedIn' || event.data === 'userLoggedOut') {
         // Refresh user state
-        window.location.reload();
+        //window.location.reload();
     }
 });
 </script>

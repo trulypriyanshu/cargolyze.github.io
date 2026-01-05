@@ -1,233 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cargolyze - Pricing</title>
   <link rel="icon" type="image/png" href="./image/favicon.svg">
-  <link rel="shortcut icon" type="image/png" href="./image/favicon.svg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <!-- Paddle.js SDK -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     }
 
     :root {
-      --slate-grey: #37474F;
-      --industrial-orange: #FF5722;
-      --industrial-orange-light: rgba(255, 87, 34, 0.1);
-      --industrial-orange-dark: #E64A19;
-      --light-slate-grey: #546E7A;
-      --white: #FFFFFF;
-      --light: #f8fafc;
-      --dark: #1e293b;
+      --background: #0a0a0a;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --card-bg-light: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.1);
+      --text-primary: #FFFFFF;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #FF5722;
+      --accent-dark: #E64A19;
+      --accent-light: rgba(255, 87, 34, 0.1);
       --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --surface: #ffffff;
-      --border: #e2e8f0;
-      --grey-light: #f5f5f5;
-      --grey-medium: #e0e0e0;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 20px;
     }
 
     body {
-      background: var(--light);
-      color: var(--slate-grey);
-      line-height: 1.6;
+      background: var(--background);
+      color: var(--text-primary);
       min-height: 100vh;
-      scroll-padding-top: 80px;
+      overflow-x: hidden;
     }
 
-    .container {
+    /* Background Effects */
+    .background-base {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      max-width: 2400px;
-      margin: 0 auto;
-      padding: 0 0px;
+      height: 100%;
+      z-index: -1;
     }
 
-    .compact-container {
-      max-width: 1300px;
-      padding: 0 20px;
+    .grain-background {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+      z-index: -3;
     }
 
-    /* Header Styles */
+    .grid-bg {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -2;
+    }
+
+    .large-blur {
+      background: radial-gradient(circle, rgba(255, 87, 34, 0.15) 0%, transparent 70%);
+      filter: blur(60px);
+      width: 500px;
+      height: 500px;
+      top: -250px;
+      left: -250px;
+      opacity: 0.3;
+    }
+
+    .small-blur {
+      background: radial-gradient(circle, rgba(55, 71, 79, 0.1) 0%, transparent 70%);
+      filter: blur(80px);
+      width: 300px;
+      height: 300px;
+      bottom: -150px;
+      right: -150px;
+      opacity: 0.4;
+    }
+
+    .grain-blur {
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+      filter: blur(100px);
+      width: 100%;
+      height: 100%;
+      opacity: 0.2;
+    }
+
+    /* Header */
     header {
-      background: var(--slate-grey);
-      color: white;
-      padding: 0.8rem 0;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       position: sticky;
       top: 0;
       z-index: 100;
-      border-bottom: 2px solid var(--industrial-orange);
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
     }
 
-    .header-content {
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-left: 0%;
-      margin-right: 0%;
-      padding: 0 50px; 
     }
 
-    /* Logo Styles */
     .logo {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 1.6rem;
-      font-weight: 700;
-      position: relative;
+      gap: 0.75rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
       text-decoration: none;
-      color: inherit;
-      width: 35%;
-    }
-
-    .logo:hover {
-      transform: scale(1.025);
-    }
-
-    .logo a {
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      letter-spacing: -0.5px;
     }
 
     .logo-symbol {
-      position: relative;
-      width: 45px;
-      height: 45px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transform: scale(0.6);
-    }
-
-    .logo-symbol-inner {
-      position: relative;
       width: 32px;
       height: 32px;
-      transform: rotate(45deg);
-      overflow: visible;
-    }
-
-    .logo-symbol-inner::before {
-      content: '';
-      position: absolute;
-      width: 80px;
-      height: 50px;
-      background: var(--white);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-45deg);
-    }
-
-    .logo-symbol-inner::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 0;
-      border-left: 25px solid var(--industrial-orange);
-      border-top: 25px solid transparent;
-      border-bottom: 25px solid transparent;
-      top: 50%;
-      left: 50%;
-      transform: translate(7.5px, -43.75px) rotate(135deg);
-    }
-
-    .logo-symbol-inner .logo-square {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: var(--industrial-orange);
-      top: 50%;
-      left: 50%;
-      transform: translate(35px, -275%) rotate(-45deg);
-    }
-
-    /* Logo Text */
-    .logo-text {
-      color: var(--white);
-      font-weight: 800;
-      letter-spacing: -0.5px;
+      background: var(--accent);
+      border-radius: 6px;
       position: relative;
-      font-size: 1.8rem;
-      font-family: 'Montserrat', sans-serif;
-      text-transform: uppercase;
-      left: 10%;
-      margin-right: 0px;
+      overflow: hidden;
     }
 
-    .logo-text:hover {
-      color: var(--industrial-orange);
+    .logo-symbol::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.2) 50%);
     }
 
-    .logo-tagline {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--industrial-orange);
-      opacity: 0.9;
-      letter-spacing: 0.5px;
-      margin-left: 4px;
-      text-transform: uppercase;
-      transform: translate(0,-15px);
-    }
-
-    /* Navigation Styles */
+    /* Navigation */
     .nav-links {
       display: flex;
-      /*gap: 1rem;*/
+      gap: 2rem;
       align-items: center;
-      justify-content: flex-end;
     }
 
     .nav-links a {
-      color: var(--white);
+      color: var(--text-secondary);
       text-decoration: none;
       font-weight: 600;
-      padding: 8px 16px;
-      border-radius: 4px;
-      transition: all 0.3s ease;
       font-size: 0.95rem;
+      padding: 0.5rem 0;
       position: relative;
+      transition: color 0.2s ease;
     }
 
     .nav-links a:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .nav-links a.cta-nav {
-      background: none;
-      color: var(--industrial-orange);
-      padding: 8px 20px;
-      border-radius: 4px;
-      font-weight: 720;
-      transition: all 0.3s ease;
-    }
-
-    .nav-links a.cta-nav:hover {
-      background: var(--white);
-      color: var(--industrial-orange);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+      color: var(--text-primary);
     }
 
     .nav-links a.current-nav {
-      background: var(--industrial-orange);
-      color: white;
-      padding: 8px 20px;
-      border-radius: 4px;
-      font-weight: 700;
-      transition: all 0.3s ease;
+      color: var(--accent);
+    }
+
+    .nav-links a.current-nav::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 1px;
+    }
+
+    .cta-nav {
+      background: var(--accent);
+      color: white !important;
+      padding: 0.5rem 1.5rem !important;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease !important;
+    }
+
+    .cta-nav:hover {
+      background: var(--accent-dark);
+      transform: translateY(-1px);
     }
 
     /* Mobile Menu */
@@ -235,22 +194,18 @@
       display: none;
       background: none;
       border: none;
-      color: white;
+      color: var(--text-primary);
       font-size: 1.5rem;
       cursor: pointer;
-      padding: 8px;
+      padding: 0.5rem;
     }
 
     .mobile-nav {
       display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: var(--slate-grey);
-      padding: 1rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      z-index: 99;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding: 1rem 2rem;
     }
 
     .mobile-nav.active {
@@ -259,204 +214,330 @@
 
     .mobile-nav a {
       display: block;
-      color: white;
+      color: var(--text-secondary);
       text-decoration: none;
-      padding: 0.8rem 1rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.75rem 0;
       font-weight: 600;
-    }
-
-    .mobile-nav a.current-nav {
-      display: block;
-      color: var(--industrial-orange);
-      text-decoration: none;
-      padding: 0.8rem 1rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      font-weight: 600;
-      /*text-indent: 25px;*/
-    }
-
-    .mobile-nav a:hover {
-      background: rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .mobile-nav a:last-child {
       border-bottom: none;
     }
 
+    .mobile-nav a.current-nav {
+      color: var(--accent);
+    }
+
     /* Main Content */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
     .main-content {
       padding: 4rem 0;
     }
 
     .page-title {
-      font-size: 2.5rem;
-      color: var(--slate-grey);
-      margin-bottom: 1rem;
+      font-size: 3rem;
+      font-weight: 500;
       text-align: center;
-      position: relative;
-      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .page-title::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100px;
-      height: 3px;
-      background: var(--industrial-orange);
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2.5rem;
+      }
     }
 
     .page-subtitle {
       text-align: center;
-      color: var(--light-slate-grey);
-      margin-bottom: 3rem;
-      font-size: 1.1rem;
+      color: var(--text-secondary);
+      font-size: 1.125rem;
       max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+      margin: 0 auto 3rem;
+      line-height: 1.6;
     }
 
-    /* Pricing Plans */
-    .pricing-plans {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
+    /* Billing Toggle */
+    .billing-toggle-container {
+      display: flex;
+      justify-content: center;
       margin-bottom: 4rem;
     }
 
-    .pricing-plan {
-      background: var(--white);
-      border-radius: 12px;
-      padding: 2.5rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      position: relative;
+    .billing-toggle {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 4px;
+    }
+
+    .toggle-option {
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border-radius: calc(var(--radius-md) - 2px);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toggle-option:hover {
+      color: var(--text-primary);
+    }
+
+    .toggle-option.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+    }
+
+    .save-badge {
+      background: var(--success);
+      color: white;
+      font-size: 0.75rem;
+      padding: 0.125rem 0.5rem;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    /* Pricing Cards */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-bottom: 6rem;
+      isolation: isolate;
+    }
+
+    @media (max-width: 1024px) {
+      .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    .pricing-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
       transition: all 0.3s ease;
-      border: 2px solid var(--border);
+      position: relative;
     }
 
-    .pricing-plan:hover {
+    .pricing-card:hover {
       transform: translateY(-8px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
     }
 
-    .pricing-plan.popular {
-      border-color: var(--industrial-orange);
+    .pricing-card.featured {
+      background: var(--card-bg-light);
+      border-color: var(--accent);
       transform: scale(1.05);
     }
 
-    .pricing-plan.popular:hover {
+    .pricing-card.featured:hover {
       transform: scale(1.05) translateY(-8px);
     }
 
-    .popular-badge {
+    /* Featured Card Effects */
+    .featured-yellow-highlight-bg {
       position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--industrial-orange);
-      color: white;
-      padding: 6px 20px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 700;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
     }
 
-    .plan-header {
-      text-align: center;
-      margin-bottom: 2rem;
+    .featured-hard-blur-bg {
+      position: absolute;
+      top: -100px;
+      left: -100px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255, 87, 34, 0.2) 0%, transparent 70%);
+      filter: blur(40px);
+      opacity: 0.3;
+    }
+
+    .featured-soft-blur-bg {
+      position: absolute;
+      bottom: -50px;
+      right: -50px;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(255, 87, 34, 0.1) 0%, transparent 70%);
+      filter: blur(60px);
+      opacity: 0.2;
+    }
+
+    /* Card Header */
+    .card-header {
+      padding: 2rem 2rem 1rem;
+    }
+
+    .card-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .plan-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--accent-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 1.25rem;
+    }
+
+    .popular-badge {
+      background: var(--accent);
+      color: white;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-weight: 700;
     }
 
     .plan-name {
-      font-size: 1.8rem;
-      color: var(--slate-grey);
+      font-size: 1.5rem;
+      font-weight: 600;
       margin-bottom: 0.5rem;
-      font-weight: 700;
     }
 
     .plan-description {
-      color: var(--light-slate-grey);
+      color: var(--text-secondary);
       font-size: 0.95rem;
+      line-height: 1.5;
     }
 
-    .plan-price {
-      text-align: center;
-      margin-bottom: 2rem;
+    /* Price Section */
+    .price-section {
+      padding: 0 2rem 1rem;
+    }
+
+    .price-display {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
     }
 
     .price-amount {
-      font-size: 3rem;
-      font-weight: 800;
-      color: var(--slate-grey);
+      font-size: 3.5rem;
+      font-weight: 500;
       line-height: 1;
+      letter-spacing: -1px;
     }
 
     .price-period {
-      color: var(--light-slate-grey);
-      font-size: 1rem;
-      margin-top: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
     }
 
     .price-savings {
       color: var(--success);
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-top: 0.5rem;
-    }
-
-    .plan-features {
-      margin-bottom: 2.5rem;
-    }
-
-    .plan-features h4 {
-      font-size: 1.1rem;
-      color: var(--slate-grey);
-      margin-bottom: 1.2rem;
+      font-size: 0.875rem;
       font-weight: 600;
     }
 
-    .feature-list {
+    .price-loading {
+      opacity: 0.7;
+      font-style: italic;
+    }
+
+    /* Divider */
+    .card-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem 2rem;
+    }
+
+    /* Features */
+    .features-section {
+      padding: 0 2rem 2rem;
+    }
+
+    .features-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-secondary);
+    }
+
+    .features-list {
       list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
     }
 
     .feature-item {
       display: flex;
       align-items: flex-start;
-      margin-bottom: 1rem;
+      gap: 0.75rem;
+      font-size: 0.95rem;
     }
 
-    .feature-item i {
+    .feature-item.included {
+      color: var(--text-primary);
+    }
+
+    .feature-item.excluded {
+      color: var(--text-muted);
+    }
+
+    .feature-icon {
+      flex-shrink: 0;
+      margin-top: 0.125rem;
+    }
+
+    .feature-icon.included {
       color: var(--success);
-      margin-right: 10px;
-      margin-top: 3px;
     }
 
-    .feature-item .feature-text {
-      flex: 1;
-    }
-
-    .feature-item .feature-text del {
-      color: var(--light-slate-grey);
-      opacity: 0.7;
-    }
-
-    .feature-limit {
-      font-size: 0.9rem;
-      color: var(--light-slate-grey);
-      margin-left: 5px;
+    .feature-icon.excluded {
+      color: var(--text-muted);
     }
 
     .feature-label {
       display: inline-block;
-      background: var(--industrial-orange-light);
-      color: var(--industrial-orange);
-      padding: 2px 8px;
-      border-radius: 4px;
+      background: var(--accent-light);
+      color: var(--accent);
       font-size: 0.75rem;
+      padding: 0.125rem 0.5rem;
+      border-radius: 4px;
+      margin-left: 0.5rem;
       font-weight: 600;
-      margin-left: 8px;
     }
 
     .feature-label.new {
@@ -464,85 +545,88 @@
       color: var(--success);
     }
 
+    /* CTA Button */
+    .card-cta {
+      padding: 0 2rem 2rem;
+    }
+
     .plan-button {
       display: block;
       width: 100%;
-      text-align: center;
-      background: var(--industrial-orange);
-      color: white;
       padding: 1rem;
-      border-radius: 8px;
+      background: var(--accent);
+      color: white;
       text-decoration: none;
-      font-weight: 700;
+      text-align: center;
+      border-radius: var(--radius-md);
+      font-weight: 600;
       font-size: 1rem;
-      transition: all 0.3s ease;
       border: none;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
 
     .plan-button:hover {
-      background: var(--industrial-orange-dark);
+      background: var(--accent-dark);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
     }
 
     .plan-button.secondary {
-      background: var(--white);
-      color: var(--slate-grey);
-      border: 2px solid var(--border);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
     }
 
     .plan-button.secondary:hover {
-      background: var(--light);
-      border-color: var(--industrial-orange);
-      color: var(--industrial-orange);
+      background: rgba(255, 255, 255, 0.15);
     }
 
     /* Comparison Table */
     .comparison-section {
-      margin-bottom: 4rem;
+      margin-bottom: 6rem;
     }
 
     .section-title {
       font-size: 2rem;
-      color: var(--slate-grey);
-      margin-bottom: 2rem;
+      font-weight: 500;
       text-align: center;
+      margin-bottom: 3rem;
       position: relative;
-      padding-bottom: 1rem;
+      display: inline-block;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     .section-title::after {
       content: '';
       position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 3px;
-      background: var(--industrial-orange);
+      bottom: -0.5rem;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
     }
 
     .comparison-table {
       width: 100%;
       border-collapse: collapse;
-      background: var(--white);
-      border-radius: 8px;
+      background: var(--card-bg);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
 
     .comparison-table th,
     .comparison-table td {
-      padding: 1.2rem;
+      padding: 1.25rem 1.5rem;
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
 
     .comparison-table th {
-      background: var(--light);
-      font-weight: 700;
-      color: var(--slate-grey);
+      background: rgba(255, 255, 255, 0.05);
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
     .comparison-table th:first-child {
@@ -550,7 +634,7 @@
     }
 
     .comparison-table td:first-child {
-      font-weight: 600;
+      font-weight: 500;
     }
 
     .comparison-table tr:last-child td {
@@ -559,257 +643,175 @@
 
     .check-icon {
       color: var(--success);
-      font-size: 1.2rem;
+      font-size: 1.25rem;
     }
 
     .cross-icon {
-      color: var(--danger);
-      font-size: 1.2rem;
+      color: var(--text-muted);
+      font-size: 1.25rem;
     }
 
     /* FAQ Section */
     .faq-section {
-      margin-bottom: 4rem;
+      margin-bottom: 6rem;
     }
 
     .faq-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1.5rem;
+      margin-top: 3rem;
     }
 
     .faq-item {
-      background: var(--white);
-      border-radius: 8px;
+      background: var(--card-bg);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
       padding: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     .faq-item h4 {
-      color: var(--slate-grey);
-      margin-bottom: 0.8rem;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
       font-size: 1.1rem;
+      font-weight: 600;
     }
 
     .faq-item p {
-      color: var(--dark);
-      opacity: 0.9;
-      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
     }
 
-    /* CTA Section */
-    .cta-section {
-      background: linear-gradient(135deg, var(--slate-grey) 0%, #263238 100%);
-      color: white;
+    /* CTA Banner */
+    .cta-banner {
+      background: linear-gradient(135deg, rgba(255, 87, 34, 0.1) 0%, rgba(55, 71, 79, 0.1) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
       padding: 4rem 2rem;
-      border-radius: 12px;
       text-align: center;
+      margin-bottom: 6rem;
+      position: relative;
+      overflow: hidden;
     }
 
-    .cta-section h2 {
-      font-size: 2.2rem;
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .cta-banner h2 {
+      font-size: 2.5rem;
+      font-weight: 500;
       margin-bottom: 1rem;
     }
 
-    .cta-section p {
-      font-size: 1.1rem;
-      opacity: 0.9;
+    .cta-banner p {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
       max-width: 600px;
       margin: 0 auto 2rem;
+      line-height: 1.6;
     }
 
     .cta-button {
       display: inline-block;
-      background: var(--industrial-orange);
-      color: white;
       padding: 1rem 2.5rem;
-      border-radius: 8px;
-      font-weight: 700;
+      background: var(--accent);
+      color: white;
       text-decoration: none;
-      font-size: 1.1rem;
-      transition: all 0.3s ease;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 1.125rem;
+      transition: all 0.2s ease;
     }
 
     .cta-button:hover {
-      background: var(--industrial-orange-dark);
+      background: var(--accent-dark);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
     }
 
     /* Footer */
     footer {
-      background: var(--slate-grey);
-      color: white;
+      border-top: 1px solid var(--border);
       padding: 3rem 0 1.5rem;
-      text-align: center;
-      margin-top: 3rem;
-      border-top: 2px solid var(--industrial-orange);
     }
 
     .footer-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2rem;
-      margin-bottom: 2rem;
+      text-align: center;
     }
 
     .footer-logo {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       font-weight: 800;
-      color: var(--white);
-      margin-bottom: -0.8rem;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .footer-tagline {
+      color: var(--accent);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2rem;
     }
 
     .footer-links {
       display: flex;
+      justify-content: center;
       gap: 2rem;
       flex-wrap: wrap;
-      justify-content: center;
-      margin: 1rem 0;
+      margin-bottom: 2rem;
     }
 
     .footer-links a {
-      color: white;
+      color: var(--text-secondary);
       text-decoration: none;
-      opacity: 0.8;
-      transition: opacity 0.3s;
-      font-size: 0.95rem;
       font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
     }
 
     .footer-links a:hover {
-      opacity: 1;
-      color: var(--industrial-orange);
+      color: var(--accent);
     }
 
     .footer-legal {
       display: flex;
+      justify-content: center;
       gap: 1.5rem;
       flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .footer-legal a {
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.85rem;
-      transition: color 0.3s;
+      font-size: 0.875rem;
+      transition: color 0.2s ease;
     }
 
     .footer-legal a:hover {
-      color: var(--white);
+      color: var(--text-secondary);
     }
 
     .copyright {
-      opacity: 0.7;
-      font-size: 0.85rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      font-size: 0.875rem;
       margin-top: 1.5rem;
+      opacity: 0.8;
     }
 
-    /* Toggle Switch - Updated for radio buttons */
-    .billing-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 3rem;
-      width: 100%;
-    }
-
-    .toggle-label {
-      font-weight: 600;
-      color: var(--slate-grey);
-      cursor: pointer;
-      padding: 8px 16px;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .toggle-label sup {
-      font-size: 0.7rem;
-      background: var(--success);
-      color: white;
-      padding: 2px 6px;
-      border-radius: 10px;
-      margin-left: 4px;
-    }
-
-    .billing-toggle input[type="radio"] {
-      display: none;
-    }
-
-    .billing-toggle input[type="radio"]:checked + .toggle-label {
-      background: var(--industrial-orange-light);
-      color: var(--industrial-orange);
-      font-weight: 700;
-    }
-
-    /* Savings Badge */
-    .savings-badge {
-      display: inline-block;
-      background: var(--success);
-      color: white;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      margin-left: 5px;
-      vertical-align: middle;
-    }
-
-    /* Price Loading State */
-    .price-loading {
-      opacity: 0.7;
-      font-style: italic;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 887px) {
-      .header-content {
-        padding: 0 20px;
-      }
-    }
-
-    @media (max-width: 834px) {
-      .pricing-plans {
-        grid-template-columns: 1fr;
-        max-width: 400px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .pricing-plan.popular {
-        transform: none;
-      }
-
-      .pricing-plan.popular:hover {
-        transform: translateY(-8px);
-      }
-
-      .nav-links {
-        display: none;
-      }
-
-      .page-title {
-        font-size: 2rem;
-      }
-
-      .section-title {
-        font-size: 1.8rem;
-      }
-
-      .comparison-table {
-        display: block;
-        overflow-x: auto;
-      }
-
+    /* Responsive */
+    @media (max-width: 768px) {
       .nav-links {
         display: none;
       }
@@ -818,41 +820,21 @@
         display: block;
       }
 
-      header {
-        height: 70px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      header {
-        height: 60px;
+      .nav-container {
+        padding: 1rem;
       }
 
-      .header-content {
-        height: 33px;
-        padding: 0 10px;
+      .container {
+        padding: 0 1rem;
       }
 
-      .logo {
-        transform: translate(0px, 0px) scale(0.7);
-        width: 65%;
-        left: -7.5%;
+      .main-content {
+        padding: 3rem 0;
       }
 
-      .logo-text {
-        font-size: 1.8rem;
-      }
-
-      .pricing-plan {
-        padding: 2rem;
-      }
-
-      .page-title {
-        font-size: 1.8rem;
-      }
-
-      .faq-grid {
-        grid-template-columns: 1fr;
+      .comparison-table {
+        display: block;
+        overflow-x: auto;
       }
 
       .footer-links {
@@ -861,215 +843,268 @@
       }
 
       .footer-legal {
-        flex-direction: row;
-        gap: 1rem;
-      }
-      
-      .billing-toggle {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.75rem;
       }
     }
   </style>
 </head>
-
 <body>
+  <!-- Background Effects -->
+  <div class="background-base grain-blur"></div>
+  <div class="background-base grain-background"></div>
+  <div class="background-base grid-bg"></div>
+  <div class="background-base large-blur"></div>
+  <div class="background-base small-blur"></div>
+
   <!-- Header -->
   <header>
-    <div class="container">
-      <div class="header-content">
-        <div class="logo">
-          <a href="index.html" class="logo-link">
-            <div class="logo-symbol">
-              <div class="logo-symbol-inner">
-                <div class="logo-square"></div>
-              </div>
-            </div>
-            <span class="logo-text">CARGOLYZE</span>
-          </a>
-        </div>
-        <!-- Desktop Navigation -->
-        <nav class="nav-links">
-          <a href="index.html">Home</a>
-          <a href="index.html#features">Features</a>
-          <a href="index.html#carriers">Carriers</a>
-          <a href="pricing.html" class="current-nav">Pricing</a>
-          <a href="index.html#interest" class="cta-nav">Get Started</a>
-        </nav>
-        
-        <!-- Mobile Menu Button -->
-        <button class="mobile-menu-btn" id="mobileMenuBtn">
-          <i class="fas fa-bars"></i>
-        </button>
-        
-      </div>
-      
-      <!-- Mobile Navigation -->
-      <div class="mobile-nav" id="mobileNav">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <div class="logo-symbol"></div>
+        <span>CARGOLYZE</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="nav-links">
         <a href="index.html">Home</a>
         <a href="index.html#features">Features</a>
         <a href="index.html#carriers">Carriers</a>
         <a href="pricing.html" class="current-nav">Pricing</a>
-        <a href="index.html#interest">Get Started</a>
-        <a href="terms.html">Terms of Service</a>
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="refund.html">Refund Policy</a>
-      </div>
+        <a href="index.html#interest" class="cta-nav">Get Started</a>
+      </nav>
+
+      <!-- Mobile Menu Button -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobileNav">
+      <a href="index.html">Home</a>
+      <a href="index.html#features">Features</a>
+      <a href="index.html#carriers">Carriers</a>
+      <a href="pricing.html" class="current-nav">Pricing</a>
+      <a href="index.html#interest">Get Started</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="refund.html">Refund Policy</a>
     </div>
   </header>
 
   <!-- Main Content -->
   <main class="main-content">
-    <div class="container compact-container">
+    <div class="container">
       <h1 class="page-title">Simple, Transparent Pricing</h1>
       <p class="page-subtitle">Choose the perfect plan for your logistics needs. All plans include core tracking features with no hidden fees.</p>
 
-      <!-- Billing Toggle - Updated for Paddle -->
-      <div class="billing-toggle">
-        <input type="radio" name="billingCycle" id="monthlyToggle" value="month" checked>
-        <label for="monthlyToggle" class="toggle-label">Monthly</label>
-        
-        <input type="radio" name="billingCycle" id="annualToggle" value="year">
-        <label for="annualToggle" class="toggle-label">Annual <sup>Save 20%</sup></label>
+      <!-- Billing Toggle -->
+      <div class="billing-toggle-container">
+        <div class="billing-toggle">
+          <button class="toggle-option active" data-billing="month">
+            Monthly
+          </button>
+          <button class="toggle-option" data-billing="year">
+            Annual
+            <span class="save-badge">Save 20%</span>
+          </button>
+        </div>
       </div>
 
       <!-- Pricing Plans -->
-      <div class="pricing-plans" id="plans">
+      <div class="pricing-grid" id="plans">
         <!-- Starter Plan -->
-        <div class="pricing-plan">
-          <div class="plan-header">
+        <div class="pricing-card">
+          <div class="card-header">
+            <div class="card-header-top">
+              <div class="plan-icon">
+                <i class="fas fa-rocket"></i>
+              </div>
+            </div>
             <h3 class="plan-name">Starter</h3>
             <p class="plan-description">Perfect for small businesses and individual logistics managers</p>
           </div>
-          <div class="plan-price">
-            <div class="price-amount" id="starter-price">$49</div>
+
+          <div class="price-section">
+            <div class="price-display">
+              <div class="price-amount" id="starter-price">$49</div>
+            </div>
             <div class="price-period" id="starter-period">per month</div>
             <div class="price-savings" id="starter-savings"></div>
           </div>
-          <div class="plan-features">
-            <h4>What's included:</h4>
-            <ul class="feature-list">
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Up to 100 shipments per month</span>
+
+          <div class="card-divider"></div>
+
+          <div class="features-section">
+            <h4 class="features-title">What's included:</h4>
+            <ul class="features-list">
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Up to 100 shipments per month</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Basic ETA tracking for 5 carriers</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Basic ETA tracking for 5 carriers</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Excel file integration</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Excel file integration</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Email support (48-hour response)</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Email support (48-hour response)</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-times"></i>
-                <span class="feature-text"><del>Port-to-port transit analysis</del></span>
+              <li class="feature-item excluded">
+                <i class="fas fa-times feature-icon excluded"></i>
+                <span>Port-to-port transit analysis</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-times"></i>
-                <span class="feature-text"><del>Custom reporting & dashboards</del></span>
+              <li class="feature-item excluded">
+                <i class="fas fa-times feature-icon excluded"></i>
+                <span>Custom reporting & dashboards</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-times"></i>
-                <span class="feature-text"><del>API access</del></span>
+              <li class="feature-item excluded">
+                <i class="fas fa-times feature-icon excluded"></i>
+                <span>API access</span>
               </li>
             </ul>
           </div>
-          <button class="plan-button secondary" data-price-id-month="pri_01kde4v2tkqhp8agkh54ewr79t" data-price-id-year="pri_01kde4ngdrzbeyn778gj11ve0h">Start Free Trial</button>
+
+          <div class="card-cta">
+            <a href="#" class="plan-button secondary" data-plan="starter" data-billing="month" id="starter-button">
+              Start Free Trial
+            </a>
+          </div>
         </div>
 
-        <!-- Professional Plan (Most Popular) -->
-        <div class="pricing-plan popular">
-          <div class="popular-badge">MOST POPULAR</div>
-          <div class="plan-header">
+        <!-- Professional Plan (Featured) -->
+        <div class="pricing-card featured">
+          <div class="featured-yellow-highlight-bg"></div>
+          <div class="featured-hard-blur-bg"></div>
+          <div class="featured-soft-blur-bg"></div>
+          
+          <div class="card-header">
+            <div class="card-header-top">
+              <div class="plan-icon">
+                <i class="fas fa-briefcase"></i>
+              </div>
+              <div class="popular-badge">MOST POPULAR</div>
+            </div>
             <h3 class="plan-name">Professional</h3>
             <p class="plan-description">Ideal for growing logistics departments and freight forwarders</p>
           </div>
-          <div class="plan-price">
-            <div class="price-amount" id="pro-price">$149</div>
+
+          <div class="price-section">
+            <div class="price-display">
+              <div class="price-amount" id="pro-price">$149</div>
+            </div>
             <div class="price-period" id="pro-period">per month</div>
             <div class="price-savings" id="pro-savings"></div>
           </div>
-          <div class="plan-features">
-            <h4>Everything in Starter, plus:</h4>
-            <ul class="feature-list">
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Up to 1,000 shipments per month</span>
+
+          <div class="card-divider"></div>
+
+          <div class="features-section">
+            <h4 class="features-title">Everything in Starter, plus:</h4>
+            <ul class="features-list">
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Up to 1,000 shipments per month</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Advanced tracking for all carriers <span class="feature-label">ALL 5+</span></span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>
+                  Advanced tracking for all carriers
+                  <span class="feature-label">ALL 5+</span>
+                </span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Custom reporting & dashboards</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Custom reporting & dashboards</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Excel file integration</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Excel file integration</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Priority email support (24-hour)</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Priority email support (24-hour)</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Basic API access <span class="feature-limit">(5,000 calls/month)</span></span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Basic API access (5,000 calls/month)</span>
               </li>
             </ul>
           </div>
-          <button class="plan-button" data-price-id-month="pri_01kde4c3caqdrdx9msgfxg6p50" data-price-id-year="pri_01kde4fnzbj4ahwrdtpaagntc0">Start Free Trial</button>
+
+          <div class="card-cta">
+            <a href="#" class="plan-button" data-plan="professional" data-billing="month" id="pro-button">
+              Start Free Trial
+            </a>
+          </div>
         </div>
 
         <!-- Enterprise Plan -->
-        <div class="pricing-plan">
-          <div class="plan-header">
+        <div class="pricing-card">
+          <div class="card-header">
+            <div class="card-header-top">
+              <div class="plan-icon">
+                <i class="fas fa-building"></i>
+              </div>
+            </div>
             <h3 class="plan-name">Enterprise</h3>
             <p class="plan-description">For large corporations and logistics service providers</p>
           </div>
-          <div class="plan-price">
-            <div class="price-amount">Custom</div>
+
+          <div class="price-section">
+            <div class="price-display">
+              <div class="price-amount">Custom</div>
+            </div>
             <div class="price-period">tailored pricing</div>
           </div>
-          <div class="plan-features">
-            <h4>Everything in Professional, plus:</h4>
-            <ul class="feature-list">
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Unlimited shipments</span>
+
+          <div class="card-divider"></div>
+
+          <div class="features-section">
+            <h4 class="features-title">Everything in Professional, plus:</h4>
+            <ul class="features-list">
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Unlimited shipments</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Custom carrier integrations <span class="feature-label new">NEW</span></span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>
+                  Custom carrier integrations
+                  <span class="feature-label new">NEW</span>
+                </span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Dedicated account manager</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Dedicated account manager</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">White-label reporting</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>White-label reporting</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">Full API access with webhooks</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>Full API access with webhooks</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">On-premise deployment option</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>On-premise deployment option</span>
               </li>
-              <li class="feature-item">
-                <i class="fas fa-check"></i>
-                <span class="feature-text">24/7 phone & chat support</span>
+              <li class="feature-item included">
+                <i class="fas fa-check feature-icon included"></i>
+                <span>24/7 phone & chat support</span>
               </li>
             </ul>
           </div>
-          <a href="#interest" class="plan-button secondary">Contact Sales</a>
+
+          <div class="card-cta">
+            <a href="index.html#interest" class="plan-button secondary">Contact Sales</a>
+          </div>
         </div>
       </div>
 
@@ -1168,7 +1203,7 @@
           </div>
           <div class="faq-item">
             <h4>Do you offer refunds?</h4>
-            <p>We offer a 30-day money-back guarantee for annual subscriptions. Monthly plans can be canceled anytime without penalty. Please read our refund policy for more details.</p>
+            <p>We offer a 30-day money-back guarantee for annual subscriptions. Monthly plans can be canceled anytime without penalty.</p>
           </div>
           <div class="faq-item">
             <h4>Is my data secure?</h4>
@@ -1181,8 +1216,8 @@
         </div>
       </div>
 
-      <!-- CTA Section -->
-      <div class="cta-section">
+      <!-- CTA Banner -->
+      <div class="cta-banner">
         <h2>Ready to Optimize Your Logistics?</h2>
         <p>Join hundreds of logistics professionals who trust Cargolyze for accurate tracking and predictive analytics.</p>
         <a href="#plans" class="cta-button">Start Your Free Trial Today</a>
@@ -1195,14 +1230,14 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-logo">CARGOLYZE</div>
-        <div class="logo-tagline">SHIPMENT TRACKING AUTOMATION</div>
+        <div class="footer-tagline">SHIPMENT TRACKING AUTOMATION</div>
         
         <div class="footer-links">
           <a href="index.html">Home</a>
-          <a href="#features">Features</a>
-          <a href="#carriers">Carriers</a>
+          <a href="index.html#features">Features</a>
+          <a href="index.html#carriers">Carriers</a>
           <a href="pricing.html">Pricing</a>
-          <a href="#interest">Contact</a>
+          <a href="index.html#interest">Contact</a>
         </div>
         
         <div class="footer-legal">
@@ -1211,10 +1246,10 @@
           <a href="refund.html">Refund Policy</a>
           <a href="mailto:hello@cargolyze.com">Support</a>
         </div>
-      </div>
-      
-      <div class="copyright">
-        &copy; 2025 Cargolyze. All rights reserved. Prices in USD. Payments processed by Paddle.com.
+        
+        <div class="copyright">
+          &copy; 2025 Cargolyze. All rights reserved. Prices in USD. Payments processed by Paddle.com.
+        </div>
       </div>
     </div>
   </footer>
@@ -1222,10 +1257,9 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Paddle Configuration
-      // Note: Remove .set("sandbox") when going live
       Paddle.Environment.set("sandbox");
       Paddle.Initialize({ 
-        token: 'test_54c44ca44396960f6c5cd114f77' // Your client-side token
+        token: 'test_54c44ca44396960f6c5cd114f77'
       });
 
       // Mobile Menu Toggle
@@ -1235,13 +1269,8 @@
       mobileMenuBtn.addEventListener('click', function() {
         mobileNav.classList.toggle('active');
         const icon = this.querySelector('i');
-        if (mobileNav.classList.contains('active')) {
-          icon.classList.remove('fa-bars');
-          icon.classList.add('fa-times');
-        } else {
-          icon.classList.remove('fa-times');
-          icon.classList.add('fa-bars');
-        }
+        icon.classList.toggle('fa-bars');
+        icon.classList.toggle('fa-times');
       });
 
       // Close mobile menu when clicking outside
@@ -1254,235 +1283,331 @@
         }
       });
 
-      // Paddle Price Management
-      const billingToggles = document.querySelectorAll('input[name="billingCycle"]');
+      // Price management
+      const billingToggle = document.querySelector('.billing-toggle');
+      const toggleOptions = document.querySelectorAll('.toggle-option');
       const starterPriceElement = document.getElementById('starter-price');
       const starterPeriodElement = document.getElementById('starter-period');
       const starterSavingsElement = document.getElementById('starter-savings');
       const proPriceElement = document.getElementById('pro-price');
       const proPeriodElement = document.getElementById('pro-period');
       const proSavingsElement = document.getElementById('pro-savings');
-      
-      // Define your price IDs from Paddle
-      const priceItems = {
-        month: [
-          {
-            quantity: 1,
-            priceId: 'pri_01kde4v2tkqhp8agkh54ewr79t', // Starter monthly
-          },
-          {
-            quantity: 1,
-            priceId: 'pri_01kde4c3caqdrdx9msgfxg6p50', // Professional monthly
-          }
-        ],
-        year: [
-          {
-            quantity: 1,
-            priceId: 'pri_01kde4ngdrzbeyn778gj11ve0h', // Starter yearly
-          },
-          {
-            quantity: 1,
-            priceId: 'pri_01kde4fnzbj4ahwrdtpaagntc0', // Professional yearly
-          }
-        ]
+      const starterButton = document.getElementById('starter-button');
+      const proButton = document.getElementById('pro-button');
+
+      // Price IDs from Paddle
+      const priceIds = {
+        month: {
+          starter: 'pri_01kde4v2tkqhp8agkh54ewr79t',
+          professional: 'pri_01kde4c3caqdrdx9msgfxg6p50'
+        },
+        year: {
+          starter: 'pri_01kde4ngdrzbeyn778gj11ve0h',
+          professional: 'pri_01kde4fnzbj4ahwrdtpaagntc0'
+        }
       };
 
-      // Set default billing cycle
-      let currentBillingCycle = 'month';
-      
-// Fetch prices from Paddle
-async function getPrices(billingCycle) {
-  currentBillingCycle = billingCycle;
-  const items = priceItems[billingCycle];
-  
-  // Show loading state
-  starterPriceElement.textContent = 'Loading...';
-  starterPriceElement.classList.add('price-loading');
-  proPriceElement.textContent = 'Loading...';
-  proPriceElement.classList.add('price-loading');
-  
-  try {
-    // First, fetch the monthly prices for comparison (for annual savings calculation)
-    let monthlyStarterPriceInCents, monthlyProPriceInCents;
-    
-    if (billingCycle === 'year') {
-      // Only need to fetch monthly prices if we're showing annual plan
-      try {
-        const monthlyResult = await Paddle.PricePreview({
-          items: priceItems['month']
+      // Default prices (fallback if Paddle fails)
+      const defaultPrices = {
+        month: {
+          starter: 4900, // $49.00 in cents
+          professional: 14900 // $149.00 in cents
+        },
+        year: {
+          starter: 3900, // $39.00 in cents (monthly equivalent)
+          professional: 11900 // $119.00 in cents (monthly equivalent)
+        }
+      };
+
+      let currentBilling = 'month';
+
+      // Initialize with default prices first
+      updatePrices('month', true);
+      updateCheckoutLinks('month');
+
+      // Fetch prices from Paddle on page load
+      fetchPricesFromPaddle('month');
+      fetchPricesFromPaddle('year');
+
+      // Billing toggle event listeners
+      toggleOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          const billing = this.dataset.billing;
+          
+          // Update active state
+          toggleOptions.forEach(opt => opt.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Update prices and links
+          currentBilling = billing;
+          updatePrices(billing);
+          updateCheckoutLinks(billing);
         });
-        monthlyStarterPriceInCents = parseFloat(monthlyResult.data.details.lineItems[0].unitTotals.subtotal);
-        monthlyProPriceInCents = parseFloat(monthlyResult.data.details.lineItems[1].unitTotals.subtotal);
-      } catch (monthlyError) {
-        console.error('Failed to fetch monthly prices for comparison:', monthlyError);
-        // Fallback to default monthly prices
-        monthlyStarterPriceInCents = 8999; // $49.00 in cents
-        monthlyProPriceInCents = 17999;    // $149.00 in cents
+      });
+
+      // Fetch prices from Paddle
+      async function fetchPricesFromPaddle(billingCycle) {
+        const items = [
+          { priceId: priceIds[billingCycle].starter, quantity: 1 },
+          { priceId: priceIds[billingCycle].professional, quantity: 1 }
+        ];
+
+        try {
+          const result = await Paddle.PricePreview({ items });
+          console.log(`Paddle ${billingCycle} prices:`, result);
+          
+          const lineItems = result.data.details.lineItems;
+          
+          // Update our default prices with real data from Paddle
+          if (lineItems[0]) {
+            const starterPriceInCents = parseFloat(lineItems[0].unitTotals.subtotal);
+            defaultPrices[billingCycle].starter = billingCycle === 'year' ? starterPriceInCents / 12 : starterPriceInCents;
+          }
+          
+          if (lineItems[1]) {
+            const proPriceInCents = parseFloat(lineItems[1].unitTotals.subtotal);
+            defaultPrices[billingCycle].professional = billingCycle === 'year' ? proPriceInCents / 12 : proPriceInCents;
+          }
+
+          // If this is the current billing cycle, update the display
+          if (billingCycle === currentBilling) {
+            updatePrices(billingCycle);
+          }
+        } catch (error) {
+          console.error(`Failed to fetch ${billingCycle} prices from Paddle:`, error);
+          // Continue with default prices
+        }
       }
+
+      // Update price display
+      function updatePrices(billingCycle, isInitial = false) {
+        const isYearly = billingCycle === 'year';
+        const starterPrice = defaultPrices[billingCycle].starter / 100; // Convert to dollars
+        const proPrice = defaultPrices[billingCycle].professional / 100;
+        
+        // Calculate savings for annual plans
+        let starterSavings = '';
+        let proSavings = '';
+        
+        if (isYearly) {
+          const monthlyStarterPrice = defaultPrices.month.starter / 100;
+          const yearlyStarterPrice = starterPrice * 12;
+          const starterDiscount = ((monthlyStarterPrice * 12 - yearlyStarterPrice) / (monthlyStarterPrice * 12)) * 100;
+          starterSavings = `Save ${Math.round(starterDiscount)}% annually`;
+          
+          const monthlyProPrice = defaultPrices.month.professional / 100;
+          const yearlyProPrice = proPrice * 12;
+          const proDiscount = ((monthlyProPrice * 12 - yearlyProPrice) / (monthlyProPrice * 12)) * 100;
+          proSavings = `Save ${Math.round(proDiscount)}% annually`;
+        }
+
+        // Update starter plan
+        starterPriceElement.textContent = `₹${starterPrice.toFixed(isYearly ? 0 : 0)}`;
+        starterPeriodElement.textContent = isYearly ? 'per month, billed annually' : 'per month';
+        starterSavingsElement.textContent = starterSavings;
+        
+        // Update professional plan
+        proPriceElement.textContent = `₹${proPrice.toFixed(isYearly ? 0 : 0)}`;
+        proPeriodElement.textContent = isYearly ? 'per month, billed annually' : 'per month';
+        proSavingsElement.textContent = proSavings;
+
+        // Remove loading classes if this is initial load
+        if (isInitial) {
+          starterPriceElement.classList.remove('price-loading');
+          proPriceElement.classList.remove('price-loading');
+        }
+      }
+
+      // Update checkout links
+      function updateCheckoutLinks(billingCycle) {
+        const starterLink = `checkout.html?price_id=${priceIds[billingCycle].starter}&plan=starter&billing=${billingCycle}`;
+        const proLink = `checkout.html?price_id=${priceIds[billingCycle].professional}&plan=professional&billing=${billingCycle}`;
+        
+        starterButton.href = starterLink;
+        starterButton.dataset.billing = billingCycle;
+        
+        proButton.href = proLink;
+        proButton.dataset.billing = billingCycle;
+      }
+
+      // Add loading state while fetching prices
+      starterPriceElement.classList.add('price-loading');
+      proPriceElement.classList.add('price-loading');
+      starterPriceElement.textContent = 'Loading...';
+      proPriceElement.textContent = 'Loading...';
+    });
+
+// ========== LOGIN CHECK FOR CHECKOUT ==========
+function setupCheckoutButtons() {
+  const checkoutButtons = document.querySelectorAll('.plan-button[data-plan]');
+  
+  checkoutButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Check if user is logged in
+      const userData = localStorage.getItem('cargolyze_user');
+      
+      if (!userData) {
+        // User is not logged in
+        const plan = this.dataset.plan;
+        const billing = this.dataset.billing;
+        
+        // Store checkout intent
+        localStorage.setItem('checkout_intent', JSON.stringify({
+          plan: plan,
+          billing: billing,
+          timestamp: Date.now()
+        }));
+        
+        // Redirect to login page with return URL
+        window.location.href = 'login.html?redirect=checkout';
+        
+        return;
+      }
+      
+      // User is logged in - proceed to checkout
+      const url = this.href;
+      window.location.href = url;
+    });
+  });
+}
+
+// Also add event listener for the CTA banner button
+const ctaButton = document.querySelector('.cta-banner .cta-button');
+if (ctaButton) {
+  ctaButton.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    const userData = localStorage.getItem('cargolyze_user');
+    
+    if (!userData) {
+      // Store generic checkout intent (no specific plan)
+      localStorage.setItem('checkout_intent', JSON.stringify({
+        plan: null,
+        timestamp: Date.now()
+      }));
+      
+      // Redirect to login
+      window.location.href = 'login.html?redirect=checkout';
+      return;
     }
     
-    // Now fetch the actual prices for the selected billing cycle
-    const result = await Paddle.PricePreview({
-      items: items
-    });
-    
-    console.log('Paddle Price Preview Result:', result);
-    
-    const lineItems = result.data.details.lineItems;
-    const currency = result.data.currencyCode || 'USD';
-    
-    // Update prices for both plans
-    lineItems.forEach((item, index) => {
-      // Convert from cents to dollars
-      const totalAmountInCents = parseFloat(item.unitTotals.subtotal);
-      const totalAmountInDollars = totalAmountInCents / 100;
-      
-      if (index === 0) { // Starter plan
-        if (billingCycle === 'month') {
-          // Monthly plan - show full price
-          starterPriceElement.textContent = formatCurrency(totalAmountInDollars, currency);
-          starterPeriodElement.textContent = 'per month';
-          starterSavingsElement.textContent = '';
-        } else {
-          // Annual plan - show monthly equivalent price
-          const monthlyEquivalent = totalAmountInDollars / 12;
-          starterPriceElement.textContent = formatCurrency(monthlyEquivalent, currency);
-          starterPeriodElement.textContent = 'per month, billed annually';
-          
-          // Calculate savings using actual monthly prices
-          const regularAnnualCostInCents = monthlyStarterPriceInCents * 12;
-          const annualPriceInCents = totalAmountInCents;
-          const savings = ((regularAnnualCostInCents - annualPriceInCents) / regularAnnualCostInCents) * 100;
-          starterSavingsElement.textContent = `Save ${Math.round(savings)}% annually`;
-        }
-        starterPriceElement.classList.remove('price-loading');
-        
-      } else if (index === 1) { // Professional plan
-        if (billingCycle === 'month') {
-          // Monthly plan - show full price
-          proPriceElement.textContent = formatCurrency(totalAmountInDollars, currency);
-          proPeriodElement.textContent = 'per month';
-          proSavingsElement.textContent = '';
-        } else {
-          // Annual plan - show monthly equivalent price
-          const monthlyEquivalent = totalAmountInDollars / 12;
-          proPriceElement.textContent = formatCurrency(monthlyEquivalent, currency);
-          proPeriodElement.textContent = 'per month, billed annually';
-          
-          // Calculate savings using actual monthly prices
-          const regularAnnualCostInCents = monthlyProPriceInCents * 12;
-          const annualPriceInCents = totalAmountInCents;
-          const savings = ((regularAnnualCostInCents - annualPriceInCents) / regularAnnualCostInCents) * 100;
-          proSavingsElement.textContent = `Save ${Math.round(savings)}% annually`;
-        }
-        proPriceElement.classList.remove('price-loading');
-      }
-    });
-    
-  } catch (error) {
-    console.error('Paddle Price Preview Error:', error);
-    
-    // Fallback to default prices with correct formatting
-    handleFallbackPrices(billingCycle);
-  }
-}
-
-// Fallback function for when Paddle API fails
-function handleFallbackPrices(billingCycle) {
-  if (billingCycle === 'month') {
-    starterPriceElement.textContent = '$49';
-    starterPeriodElement.textContent = 'per month';
-    starterSavingsElement.textContent = '';
-    
-    proPriceElement.textContent = '$149';
-    proPeriodElement.textContent = 'per month';
-    proSavingsElement.textContent = '';
-  } else {
-    // Annual plans - show monthly equivalent
-    starterPriceElement.textContent = '$39';
-    starterPeriodElement.textContent = 'per month, billed annually';
-    starterSavingsElement.textContent = 'Save 20% annually';
-    
-    proPriceElement.textContent = '$119';
-    proPeriodElement.textContent = 'per month, billed annually';
-    proSavingsElement.textContent = 'Save 20% annually';
-  }
-  
-  starterPriceElement.classList.remove('price-loading');
-  proPriceElement.classList.remove('price-loading');
-}
-
-// Helper function to format currency (no decimals) - ALWAYS ROUND DOWN
-function formatCurrency(amount, currencyCode) {
-  // ALWAYS ROUND DOWN to nearest whole number
-  const roundedAmount = Math.floor(amount);
-  
-  // Create formatter based on currency code
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currencyCode,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    // User logged in - go to plans section
+    const plansSection = document.querySelector('#plans');
+    if (plansSection) {
+      plansSection.scrollIntoView({ behavior: 'smooth' });
+    }
   });
-  
-  return formatter.format(roundedAmount);
 }
 
-      // Setup billing toggle listeners
-      billingToggles.forEach(toggle => {
-        toggle.addEventListener('change', function() {
-          if (this.checked) {
-            getPrices(this.value);
-          }
-        });
-      });
+// Call this function after DOM loads
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // Add login check for checkout buttons
+  setupCheckoutButtons();
+  
+  // Check URL for redirect parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('redirect') === 'checkout') {
+    // User just logged in - check if they have a checkout intent
+    const checkoutIntent = localStorage.getItem('checkout_intent');
+    if (checkoutIntent) {
+      const intent = JSON.parse(checkoutIntent);
+      
+      // Clear the intent
+      localStorage.removeItem('checkout_intent');
+      
+      // Redirect to appropriate plan
+      if (intent.plan) {
+        const button = document.querySelector(`.plan-button[data-plan="${intent.plan}"]`);
+        if (button) {
+          button.click();
+          return;
+        }
+      }
+      
+      // If no specific plan, scroll to plans
+      const plansSection = document.querySelector('#plans');
+      if (plansSection) {
+        plansSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }
+  
+  // Update navigation based on login status
+  updateNavigationForUser();
+});
 
-      // Setup checkout buttons
-      document.querySelectorAll('.plan-button[data-price-id-month]').forEach(button => {
-        button.addEventListener('click', function(e) {
-          e.preventDefault();
-          
-          const priceId = currentBillingCycle === 'month' 
-            ? this.getAttribute('data-price-id-month')
-            : this.getAttribute('data-price-id-year');
-          
-          Paddle.Checkout.open({
-            items: [{
-              priceId: priceId,
-              quantity: 1
-            }],
-            successCallback: function(data) {
-              console.log('Checkout completed:', data);
-              // Redirect to thank you page or dashboard
-              // window.location.href = '/thank-you.html';
-            },
-            closeCallback: function() {
-              console.log('Checkout closed');
-            }
-          });
-        });
-      });
+// ========== USER SESSION MANAGEMENT ==========
+function updateNavigationForUser() {
+  const userData = localStorage.getItem('cargolyze_user');
+  
+  // Get or create the account link container
+  let accountNavContainer = document.querySelector('#accountNavContainer');
+  
+  if (!accountNavContainer) {
+    // Create account navigation container if it doesn't exist
+    accountNavContainer = document.createElement('div');
+    accountNavContainer.id = 'accountNavContainer';
+    
+    // Insert before mobile menu button
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    if (mobileMenuBtn) {
+      mobileMenuBtn.parentNode.insertBefore(accountNavContainer, mobileMenuBtn);
+    } else {
+      // Insert at end of nav-links
+      const navLinks = document.querySelector('.nav-links');
+      if (navLinks) {
+        navLinks.appendChild(accountNavContainer);
+      }
+    }
+  }
+  
+  if (userData) {
+    try {
+      const user = JSON.parse(userData);
+      
+      // Create logged in navigation
+      accountNavContainer.innerHTML = `
+        <a href="account.html" class="cta-nav logged-in">
+          <i class="fas fa-user" style="margin-right: 5px;"></i> ${user.name || 'Account'}
+        </a>
+      `;
+      
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      createSignUpLink();
+    }
+  } else {
+    createSignUpLink();
+  }
+}
 
-      // Smooth scroll for anchor links
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-          e.preventDefault();
-          const targetId = this.getAttribute('href');
-          if (targetId === '#') return;
-          
-          const targetElement = document.querySelector(targetId);
-          if (targetElement) {
-            window.scrollTo({
-              top: targetElement.offsetTop - 400,
-              behavior: 'smooth'
-            });
-          }
-        });
-      });
+function createSignUpLink() {
+  const accountNavContainer = document.querySelector('#accountNavContainer');
+  if (accountNavContainer) {
+    accountNavContainer.innerHTML = `
+      <a href="login.html" class="cta-nav">
+        <i class="fas fa-user" style="margin-right: 5px;"></i> Sign Up
+      </a>
+    `;
+  }
+}
 
-      // Initialize prices on page load (default to monthly)
-      getPrices('month');
-    });
+// Listen for storage events (for multi-tab sync)
+window.addEventListener('storage', function(e) {
+  if (e.key === 'cargolyze_user' || e.key === 'cargolyze_logout_event') {
+    updateNavigationForUser();
+  }
+});
+
+// Listen for message events
+window.addEventListener('message', function(e) {
+  if (e.data === 'userLoggedIn' || e.data === 'userLoggedOut') {
+    updateNavigationForUser();
+  }
+});
   </script>
 </body>
 </html>
