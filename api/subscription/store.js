@@ -9,7 +9,7 @@ const PADDLE_API_KEY = process.env.PADDLE_API_KEY;
 
 // CORS headers configuration
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://cargolyze.com',
+  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Credentials': 'true',
