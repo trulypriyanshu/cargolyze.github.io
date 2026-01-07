@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Your Purchase - Cargolyze</title>
+  <link rel="icon" type="image/png" href="./image/favicon.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    }
+
+    :root {
+      --background: #0a0a0a;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --border: rgba(255, 255, 255, 0.1);
+      --text-primary: #FFFFFF;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #FF5722;
+      --accent-dark: #E64A19;
+      --success: #10b981;
+      --info: #3b82f6;
+      --error: #ef4444;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Background Effects */
+    .background-base {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .grain-background {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+      z-index: -3;
+    }
+
+    .grid-bg {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -2;
+    }
+
+    .checkout-hard-blur {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 87, 34, 0.15) 0%, transparent 70%);
+      filter: blur(40px);
+      z-index: -1;
+      opacity: 0.3;
+      top: -200px;
+      left: -200px;
+    }
+
+    .checkout-soft-blur {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(55, 71, 79, 0.1) 0%, transparent 70%);
+      filter: blur(60px);
+      z-index: -1;
+      opacity: 0.4;
+      bottom: -150px;
+      right: -150px;
+    }
+
+    .checkout-yellow-highlight {
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+      left: 0;
+      top: 0;
+      opacity: 0.5;
+    }
+
+    /* Container Layout */
+    .checkout-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (min-width: 768px) {
+      .checkout-container {
+        padding: 32px;
+      }
+    }
+
+    /* Header */
+    .checkout-header {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: #182222;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .back-button:hover {
+      background: #1a2a2a;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    /* Main Content Layout */
+    .checkout-content {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      .checkout-content {
+        padding: 40px 60px;
+        min-height: 400px;
+      }
+    }
+
+    /* Desktop Layout */
+    .desktop-checkout {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .desktop-checkout {
+        display: flex;
+        gap: 64px;
+      }
+    }
+
+    /* Mobile Layout */
+    .mobile-checkout {
+      display: block;
+    }
+
+    @media (min-width: 768px) {
+      .mobile-checkout {
+        display: none;
+      }
+    }
+
+    /* Order Summary */
+    .order-summary-section {
+      flex: 0 0 400px;
+    }
+
+    .order-summary-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 32px;
+    }
+
+    .price-display {
+      padding-top: 32px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .price-main {
+      font-size: 48px;
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -1.6px;
+    }
+
+    .price-note {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .billing-period {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
+
+    .billing-then {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Trial Badge */
+    .trial-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--info);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .trial-badge i {
+      font-size: 12px;
+    }
+
+    /* Quantity Selector */
+    .quantity-section {
+      margin-top: 48px;
+    }
+
+    .quantity-label {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #182222;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px;
+      width: fit-content;
+    }
+
+    .quantity-controls.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .quantity-btn {
+      width: 32px;
+      height: 32px;
+      background: #182222;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .quantity-btn:hover:not(:disabled) {
+      background: #1a2a2a;
+      color: var(--text-primary);
+    }
+
+    .quantity-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      background: transparent;
+    }
+
+    .quantity-input {
+      width: 56px;
+      height: 32px;
+      background: #182222;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .quantity-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .quantity-input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Plan Switch Button */
+    .plan-switch-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .plan-switch-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .plan-switch-button:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .plan-switch-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .plan-switch-button i {
+      font-size: 12px;
+    }
+
+    /* Coupon Code Section */
+    .coupon-section {
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .coupon-label {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .coupon-input-group {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+      margin-bottom: 8px;
+    }
+
+    .coupon-input {
+      flex: 1;
+      background: #182222;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .coupon-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(255, 87, 34, 0.1);
+    }
+
+    .coupon-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .coupon-input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .coupon-button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .coupon-button:hover:not(:disabled) {
+      background: var(--accent-dark);
+      transform: translateY(-1px);
+    }
+
+    .coupon-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .coupon-button.remove {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .coupon-button.remove:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--error);
+      color: var(--error);
+    }
+
+    .coupon-feedback {
+      margin-top: 8px;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    .coupon-success {
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .coupon-error {
+      color: var(--error);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .coupon-info {
+      color: var(--info);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Price Breakdown */
+    .price-breakdown {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 16px;
+    }
+
+    .breakdown-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .breakdown-value {
+      font-weight: 600;
+    }
+
+    .breakdown-row.discount {
+      color: var(--success);
+    }
+
+    .breakdown-row.discount .breakdown-label {
+      color: var(--success);
+    }
+
+    .breakdown-row.trial-info {
+      color: var(--info);
+      font-size: 14px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      margin-top: 8px;
+      padding-top: 12px;
+    }
+
+    .breakdown-total {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .breakdown-row.future-total {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+    }
+
+    .future-total-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .future-date {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: normal;
+    }
+
+    .total-label {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .total-value {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    /* Plan Details */
+    .plan-details {
+      margin-top: 32px;
+    }
+
+    .plan-name {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .plan-description {
+      color: var(--text-secondary);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    /* Payment Section */
+    .payment-section {
+      flex: 1;
+      min-width: 375px;
+    }
+
+    @media (min-width: 1024px) {
+      .payment-section {
+        min-width: 535px;
+      }
+    }
+
+    .payment-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 32px;
+    }
+
+    /* Paddle Checkout Containers - SIMPLE IFRAME LIKE AEROEDIT */
+    .paddle-checkout-frame {
+      width: 100%;
+      min-height: 600px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .paddle-frame {
+      width: 100% !important;
+      background-color: transparent !important;
+      border: none !important;
+      min-height: 600px;
+    }
+
+    .paddle-frame-inline {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Mobile Accordion */
+    .mobile-accordion {
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .mobile-accordion::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+      opacity: 0.5;
+    }
+
+    .accordion-trigger {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0 16px 16px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .accordion-trigger:hover {
+      color: var(--text-primary);
+    }
+
+    .accordion-icon {
+      transition: transform 0.2s ease;
+      margin-left: 16px;
+    }
+
+    .accordion-trigger[aria-expanded="true"] .accordion-icon {
+      transform: rotate(180deg);
+    }
+
+    .accordion-content {
+      overflow: hidden;
+      transition: all 0.2s ease;
+      padding-left: 16px;
+    }
+
+    .accordion-content[hidden] {
+      display: none;
+    }
+
+    /* Loading State */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Success Message */
+    .success-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 20px;
+      animation: fadeIn 0.5s ease;
+      min-height: 70vh;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(16, 185, 129, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 32px;
+      font-size: 2.5rem;
+      color: var(--success);
+    }
+
+    .success-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .success-text {
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .success-countdown {
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .countdown-timer {
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    .dashboard-button {
+      display: inline-block;
+      margin-top: 32px;
+      padding: 12px 24px;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .dashboard-button:hover {
+      background: var(--accent-dark);
+      transform: translateY(-2px);
+    }
+
+    /* Error Message */
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      margin: 16px 0;
+      text-align: center;
+    }
+
+    .error-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    /* Utility Classes */
+    .hidden {
+      display: none !important;
+    }
+
+    /* ========== MOBILE FIXES ========== */
+    @media (max-width: 767px) {
+      .checkout-container {
+        padding: 16px !important;
+      }
+      
+      .checkout-content {
+        padding: 20px !important;
+        min-height: auto !important;
+      }
+      
+      .mobile-checkout {
+        display: block !important;
+      }
+      
+      .desktop-checkout {
+        display: none !important;
+      }
+      
+      .price-display {
+        padding-top: 20px !important;
+      }
+      
+      .price-main {
+        font-size: 36px !important;
+      }
+      
+      .price-note {
+        font-size: 14px !important;
+      }
+      
+      .accordion-content {
+        padding-left: 0 !important;
+      }
+      
+      .coupon-input-group {
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+      
+      .coupon-input {
+        width: 100% !important;
+      }
+      
+      .coupon-button {
+        width: 100% !important;
+      }
+      
+      .paddle-checkout-frame {
+        min-height: 500px !important;
+      }
+      
+      .paddle-frame {
+        min-height: 500px !important;
+      }
+      
+      .success-message {
+        padding: 40px 20px !important;
+      }
+      
+      .success-icon {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 2rem !important;
+      }
+      
+      .success-title {
+        font-size: 20px !important;
+      }
+    }
+    
+    @media (min-width: 768px) {
+      .mobile-checkout {
+        display: none !important;
+      }
+      
+      .desktop-checkout {
+        display: flex !important;
+      }
+    }
+    
+    /* Fix for very small screens */
+    @media (max-width: 360px) {
+      .checkout-container {
+        padding: 12px !important;
+      }
+      
+      .checkout-content {
+        padding: 16px !important;
+      }
+      
+      .price-main {
+        font-size: 32px !important;
+      }
+      
+      .accordion-trigger {
+        padding: 12px 0 12px 12px !important;
+        font-size: 14px !important;
+      }
+    }
+    
+    /* Prevent horizontal scrolling */
+    body {
+      overflow-x: hidden !important;
+    }
+    
+    /* Make inputs more touch-friendly on mobile */
+    @media (max-width: 767px) {
+      .quantity-btn {
+        width: 36px !important;
+        height: 36px !important;
+      }
+      
+      .quantity-input {
+        width: 50px !important;
+        height: 36px !important;
+      }
+      
+      .coupon-input {
+        padding: 12px 16px !important;
+      }
+      
+      .coupon-button {
+        padding: 12px !important;
+      }
+    }
+    
+    /* Hide scrollbar for iframe */
+    .paddle-frame-inline::-webkit-scrollbar {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Effects -->
+  <div class="background-base grain-background"></div>
+  <div class="background-base grid-bg"></div>
+  <div class="background-base checkout-hard-blur"></div>
+  <div class="background-base checkout-soft-blur"></div>
+  <div class="background-base checkout-yellow-highlight"></div>
+
+  <!-- Main Checkout Container -->
+  <main class="checkout-container">
+    <!-- Header -->
+    <div class="checkout-header">
+      <a href="pricing.html" class="back-button">
+        <i class="fas fa-chevron-left"></i>
+      </a>
+      <a href="index.html" class="logo">CARGOLYZE</a>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Preparing your checkout...</p>
+    </div>
+
+    <!-- Main Checkout Content -->
+    <div id="checkout-content" class="hidden">
+      <div class="checkout-content">
+        <!-- Desktop Layout -->
+        <div class="desktop-checkout">
+          <!-- Order Summary -->
+          <div class="order-summary-section">
+            <div class="order-summary-title">Order summary</div>
+            
+            <div id="price-display" class="price-display">
+              <!-- Will be filled by JavaScript -->
+            </div>
+
+            <div class="billing-period" id="billing-period"></div>
+            <div class="billing-then" id="billing-then"></div>
+
+            <!-- Trial Badge -->
+            <div id="trial-badge" class="hidden">
+              <!-- Will be filled by JavaScript -->
+            </div>
+
+            <div class="quantity-section">
+              <label class="quantity-label">Number of users:</label>
+              <div id="quantity-controls" class="quantity-controls disabled">
+                <button class="quantity-btn" id="decrease-qty" disabled>
+                  <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="quantity-input" class="quantity-input" value="1" min="1" max="100" disabled>
+                <button class="quantity-btn" id="increase-qty" disabled>
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Plan Switch Button -->
+            <div class="plan-switch-section">
+              <button id="switch-plan-btn" class="plan-switch-button" disabled>
+                <i class="fas fa-exchange-alt"></i>
+                <span id="switch-plan-text">Switch to Annual Plan</span>
+              </button>
+            </div>
+
+            <!-- Coupon Code Section -->
+            <div class="coupon-section">
+              <label class="coupon-label">Discount code</label>
+              <div class="coupon-input-group">
+                <input type="text" id="coupon-input" class="coupon-input" placeholder="Enter coupon code" maxlength="50">
+                <button id="apply-coupon-btn" class="coupon-button">Apply</button>
+                <button id="remove-coupon-btn" class="coupon-button remove hidden">Remove</button>
+              </div>
+              <div id="coupon-feedback" class="coupon-feedback"></div>
+            </div>
+
+            <div class="price-breakdown">
+              <div class="breakdown-row">
+                <span class="breakdown-label">Subtotal</span>
+                <span class="breakdown-value" id="subtotal"></span>
+              </div>
+              <!-- Discount row (hidden by default) -->
+              <div id="discount-row" class="breakdown-row discount hidden">
+                <span class="breakdown-label">Discount</span>
+                <span class="breakdown-value" id="discount-amount"></span>
+              </div>
+              <div class="breakdown-row">
+                <span class="breakdown-label">Tax</span>
+                <span class="breakdown-value" id="tax"></span>
+              </div>
+              <div id="trial-info-row" class="breakdown-row trial-info hidden">
+                <!-- Will be filled by JavaScript -->
+              </div>
+              <div class="breakdown-row breakdown-total">
+                <span class="total-label">Due today</span>
+                <span class="total-value" id="total-due-today"></span>
+              </div>
+              <div id="future-total-row" class="breakdown-row future-total hidden">
+                <!-- Will be filled by JavaScript -->
+              </div>
+            </div>
+
+            <div class="plan-details" id="plan-details">
+              <!-- Will be filled by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Payment Section -->
+          <div class="payment-section">
+            <div class="payment-title">Payment details</div>
+            <div class="paddle-checkout-frame">
+              <iframe 
+                class="paddle-frame paddle-frame-inline" 
+                name="paddle_frame" 
+                frameborder="0" 
+                allow="payment" 
+                style="width: 100%; background-color: transparent; border: none" 
+                height="600" 
+                id="paddle-checkout-iframe-desktop"
+                src="about:blank"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Layout -->
+        <div class="mobile-checkout">
+          <!-- Price Display -->
+          <div id="mobile-price-display" class="price-display">
+            <!-- Will be filled by JavaScript -->
+          </div>
+          <div class="billing-then" id="mobile-billing-then"></div>
+
+          <!-- Mobile Trial Badge -->
+          <div id="mobile-trial-badge" class="hidden">
+            <!-- Will be filled by JavaScript -->
+          </div>
+
+          <!-- Mobile Order Summary Accordion -->
+          <div class="mobile-accordion">
+            <button class="accordion-trigger" id="mobile-accordion-trigger" aria-expanded="false">
+              Order summary
+              <i class="fas fa-chevron-down accordion-icon"></i>
+            </button>
+            <div class="accordion-content" id="mobile-accordion-content" hidden>
+              <div class="quantity-section" style="margin-top: 24px;">
+                <label class="quantity-label">Number of users:</label>
+                <div id="mobile-quantity-controls" class="quantity-controls disabled">
+                  <button class="quantity-btn" id="mobile-decrease-qty" disabled>
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <input type="number" id="mobile-quantity-input" class="quantity-input" value="1" min="1" max="100" disabled>
+                  <button class="quantity-btn" id="mobile-increase-qty" disabled>
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Mobile Plan Switch Button -->
+              <div class="plan-switch-section" style="margin-top: 24px;">
+                <button id="mobile-switch-plan-btn" class="plan-switch-button" disabled>
+                  <i class="fas fa-exchange-alt"></i>
+                  <span id="mobile-switch-plan-text">Switch to Annual Plan</span>
+                </button>
+              </div>
+
+              <!-- Mobile Coupon Code Section -->
+              <div class="coupon-section" style="margin-top: 24px;">
+                <label class="coupon-label">Discount code</label>
+                <div class="coupon-input-group">
+                  <input type="text" id="mobile-coupon-input" class="coupon-input" placeholder="Enter coupon code" maxlength="50">
+                  <button id="mobile-apply-coupon-btn" class="coupon-button">Apply</button>
+                  <button id="mobile-remove-coupon-btn" class="coupon-button remove hidden">Remove</button>
+                </div>
+                <div id="mobile-coupon-feedback" class="coupon-feedback"></div>
+              </div>
+
+              <div class="price-breakdown" style="margin-top: 24px;">
+                <div class="breakdown-row">
+                  <span class="breakdown-label">Subtotal</span>
+                  <span class="breakdown-value" id="mobile-subtotal"></span>
+                </div>
+                <!-- Mobile Discount row (hidden by default) -->
+                <div id="mobile-discount-row" class="breakdown-row discount hidden">
+                  <span class="breakdown-label">Discount</span>
+                  <span class="breakdown-value" id="mobile-discount-amount"></span>
+                </div>
+                <div class="breakdown-row">
+                  <span class="breakdown-label">Tax</span>
+                  <span class="breakdown-value" id="mobile-tax"></span>
+                </div>
+                <div id="mobile-trial-info-row" class="breakdown-row trial-info hidden">
+                  <!-- Will be filled by JavaScript -->
+                </div>
+                <div class="breakdown-row breakdown-total">
+                  <span class="total-label">Due today</span>
+                  <span class="total-value" id="mobile-total-due-today"></span>
+                </div>
+                <div id="mobile-future-total-row" class="breakdown-row future-total hidden">
+                  <!-- Will be filled by JavaScript -->
+                </div>
+              </div>
+
+              <div class="plan-details" id="mobile-plan-details" style="margin-top: 24px;">
+                <!-- Will be filled by JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Payment Section -->
+          <div style="margin-top: 32px;">
+            <div class="payment-title">Payment details</div>
+            <div class="paddle-checkout-frame">
+              <iframe 
+                class="paddle-frame paddle-frame-inline" 
+                name="paddle_frame_mobile" 
+                frameborder="0" 
+                allow="payment" 
+                style="width: 100%; background-color: transparent; border: none" 
+                height="500" 
+                id="paddle-checkout-iframe-mobile"
+                src="about:blank"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Message -->
+    <div id="success-message" class="success-message hidden">
+      <div class="success-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <h2 class="success-title">Payment Successful!</h2>
+      <p class="success-text">Your Cargolyze subscription has been activated.</p>
+      <p class="success-text">You'll receive a confirmation email shortly.</p>
+      <div class="success-countdown">
+        <p>Redirecting to dashboard in <span id="countdown-timer" class="countdown-timer">100</span> seconds...</p>
+      </div>
+      <a href="download.html" class="dashboard-button">Go to Dashboard Now</a>
+    </div>
+
+    <!-- Error Message Container -->
+    <div id="error-container"></div>
+  </main>
+
+  <!-- NO PADDLE SDK LOADED HERE - We'll use direct iframe like AeroEdit -->
+
+  <script>
+    // ========== SIMPLE SOLUTION LIKE AEROEDIT ==========
+    
+    // Global state
+    let quantity = 1;
+    let currentPriceId = '';
+    let currentPlan = '';
+    let currentBilling = '';
+    let isYearly = false;
+    let trialPeriod = null;
+    let trialEndDate = null;
+    let currentCoupon = null;
+    let checkoutUrl = '';
+    let isMobile = window.innerWidth < 768;
+
+    // Define plan details
+    const planDetails = {
+      'starter': {
+        name: 'Starter Plan',
+        description: 'Perfect for small businesses and individual logistics managers',
+        monthlyPrice: 49,
+        yearlyPrice: 39,
+        monthlyPriceId: 'pri_01kde4v2tkqhp8agkh54ewr79t',
+        yearlyPriceId: 'pri_01kde4ngdrzbeyn778gj11ve0h',
+        features: [
+          'Up to 100 shipments per month',
+          'Basic ETA tracking for 5 carriers',
+          'Excel file integration',
+          'Email support (48-hour response)',
+          '7-day free trial'
+        ]
+      },
+      'professional': {
+        name: 'Professional Plan',
+        description: 'Ideal for growing logistics departments and freight forwarders',
+        monthlyPrice: 149,
+        yearlyPrice: 119,
+        monthlyPriceId: 'pri_01kde4c3caqdrdx9msgfxg6p50',
+        yearlyPriceId: 'pri_01kde4fnzbj4ahwrdtpaagntc0',
+        features: [
+          'Up to 1,000 shipments per month',
+          'Advanced tracking for all carriers',
+          'Custom reporting & dashboards',
+          'Priority email support (24-hour)',
+          'Basic API access',
+          '7-day free trial'
+        ]
+      }
+    };
+
+    // Function to format INR currency
+    function formatINR(amount) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(amount);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      currentPriceId = urlParams.get('price_id');
+      currentPlan = urlParams.get('plan');
+      currentBilling = urlParams.get('billing');
+      currentCoupon = urlParams.get('coupon') || null;
+      
+      // Redirect to pricing page if required parameters are missing
+      if (!currentPriceId || !currentPlan || !currentBilling) {
+        console.warn('Missing required parameters, redirecting to pricing page');
+        window.location.href = 'pricing.html';
+        return;
+      }
+      
+      isYearly = currentBilling === 'year';
+      
+      console.log('Checkout Parameters:', { 
+        priceId: currentPriceId, 
+        plan: currentPlan, 
+        billing: currentBilling,
+        coupon: currentCoupon
+      });
+      
+      // Initialize the page
+      initializePage();
+      setupQuantityControls();
+      setupMobileAccordion();
+      setupCouponControls();
+      setupPlanSwitchButton();
+      
+      // Generate checkout URL and load iframe
+      generateCheckoutUrl();
+      loadCheckoutIframe();
+    });
+
+function generateCheckoutUrl() {
+  // Instead of building a dynamic URL, use a pre-built checkout page like AeroEdit
+  // You need to have a pre-built checkout page similar to v2.html
+  checkoutUrl = './checkout-page.html'; // Or whatever you name your pre-built checkout page
+  
+  // Alternatively, if you want to keep dynamic generation, ensure the parameters are correct:
+  // const baseUrl = 'https://sandbox-buy.paddle.com/checkout/';
+  // const checkoutId = 'che_xxxxxxxxxxxxxxxx'; // You need a valid checkout ID
+  // checkoutUrl = `${baseUrl}${checkoutId}?display_mode=inline&variant=one-page&display_mode_theme=dark`;
+}
+
+function loadCheckoutIframe() {
+  // Show checkout content
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('checkout-content').classList.remove('hidden');
+  
+  // Determine which iframe to load based on screen size
+  let iframeId;
+  let iframeHeight;
+  
+  if (isMobile) {
+    iframeId = 'paddle-checkout-iframe-mobile';
+    iframeHeight = '500';
+    // Hide desktop, show mobile
+    document.querySelector('.desktop-checkout').style.display = 'none';
+    document.querySelector('.mobile-checkout').style.display = 'block';
+  } else {
+    iframeId = 'paddle-checkout-iframe-desktop';
+    iframeHeight = '600';
+    // Hide mobile, show desktop
+    document.querySelector('.mobile-checkout').style.display = 'none';
+    document.querySelector('.desktop-checkout').style.display = 'flex';
+  }
+  
+  const iframe = document.getElementById(iframeId);
+  if (iframe) {
+    console.log(`Loading checkout in ${iframeId}`);
+    
+    // Use a pre-built checkout page URL
+    // You need to create this page or get it from Paddle
+    const checkoutPageUrl = './checkout-page.html'; // Create this file
+    
+    // Set the iframe src
+    iframe.src = checkoutPageUrl;
+    iframe.height = iframeHeight;
+    
+    // Add message listener for checkout events
+    window.addEventListener('message', handleCheckoutMessage);
+  }
+}
+
+    function handleCheckoutMessage(event) {
+      // Handle messages from Paddle checkout iframe
+      console.log('Message from checkout:', event);
+      
+      // You can handle various events here
+      // For example, when checkout is completed
+      if (event.data && event.data.event === 'checkout.completed') {
+        console.log('Checkout completed via message:', event.data);
+        showSuccessWithCountdown();
+      }
+    }
+
+    function initializePage() {
+      const planDetail = planDetails[currentPlan.toLowerCase()] || planDetails.starter;
+      
+      // Update plan details
+      updatePlanDetails(planDetail);
+      
+      // Set initial price display
+      const price = isYearly ? planDetail.yearlyPrice : planDetail.monthlyPrice;
+      updatePriceDisplays(price, 0, price, 0);
+    }
+
+    function updatePriceDisplays(subtotal, tax, total, discount = 0) {
+      // Calculate amounts
+      const dueToday = trialPeriod ? 0 : total;
+      const trialDurationText = trialPeriod ? getTrialDurationText(trialPeriod) : '';
+      
+      // Desktop price display
+      const desktopPriceDisplay = document.getElementById('price-display');
+      if (desktopPriceDisplay) {
+        if (trialPeriod) {
+          desktopPriceDisplay.innerHTML = `
+            <span class="price-main">₹0.00</span>
+            <span class="price-note" style="font-size: 20px; font-weight: 600; color: var(--accent);">${trialDurationText}</span>
+          `;
+        } else {
+          desktopPriceDisplay.innerHTML = `
+            <span class="price-main">${formatINR(total)}</span>
+            <span class="price-note">inc. tax</span>
+          `;
+        }
+      }
+      
+      // Mobile price display
+      const mobilePriceDisplay = document.getElementById('mobile-price-display');
+      if (mobilePriceDisplay) {
+        if (trialPeriod) {
+          mobilePriceDisplay.innerHTML = `
+            <span class="price-main">₹0.00</span>
+            <span class="price-note" style="font-size: 20px; font-weight: 600; color: var(--accent);">${trialDurationText}</span>
+          `;
+        } else {
+          mobilePriceDisplay.innerHTML = `
+            <span class="price-main">${formatINR(total)}</span>
+            <span class="price-note">inc. tax</span>
+          `;
+        }
+      }
+      
+      // Billing period
+      const billingPeriod = document.getElementById('billing-period');
+      if (billingPeriod) {
+        billingPeriod.textContent = isYearly ? 'Billed yearly' : 'Billed monthly';
+      }
+      
+      // Update price breakdown
+      updatePriceBreakdown(subtotal, tax, total, discount);
+    }
+
+    function updatePriceBreakdown(subtotal, tax, total, discount = 0) {
+      // Calculate amounts
+      const dueToday = trialPeriod ? 0 : total;
+      
+      // Desktop breakdown
+      const subtotalEl = document.getElementById('subtotal');
+      const taxEl = document.getElementById('tax');
+      const totalDueTodayEl = document.getElementById('total-due-today');
+      
+      if (subtotalEl) subtotalEl.textContent = formatINR(subtotal);
+      if (taxEl) taxEl.textContent = tax > 0 ? formatINR(tax) : 'Calculated at checkout';
+      if (totalDueTodayEl) totalDueTodayEl.textContent = formatINR(dueToday);
+      
+      // Mobile breakdown
+      const mobileSubtotalEl = document.getElementById('mobile-subtotal');
+      const mobileTaxEl = document.getElementById('mobile-tax');
+      const mobileTotalDueTodayEl = document.getElementById('mobile-total-due-today');
+      
+      if (mobileSubtotalEl) mobileSubtotalEl.textContent = formatINR(subtotal);
+      if (mobileTaxEl) mobileTaxEl.textContent = tax > 0 ? formatINR(tax) : 'Calculated at checkout';
+      if (mobileTotalDueTodayEl) mobileTotalDueTodayEl.textContent = formatINR(dueToday);
+      
+      // Update discount display
+      updateDiscountDisplay(discount);
+    }
+
+    function updateDiscountDisplay(discount) {
+      if (discount > 0) {
+        // Show discount row
+        const discountRow = document.getElementById('discount-row');
+        const mobileDiscountRow = document.getElementById('mobile-discount-row');
+        
+        if (discountRow) discountRow.classList.remove('hidden');
+        if (mobileDiscountRow) mobileDiscountRow.classList.remove('hidden');
+        
+        // Update discount amounts
+        const discountAmount = document.getElementById('discount-amount');
+        const mobileDiscountAmount = document.getElementById('mobile-discount-amount');
+        
+        if (discountAmount) discountAmount.textContent = `-${formatINR(discount)}`;
+        if (mobileDiscountAmount) mobileDiscountAmount.textContent = `-${formatINR(discount)}`;
+      } else {
+        // Hide discount row
+        const discountRow = document.getElementById('discount-row');
+        const mobileDiscountRow = document.getElementById('mobile-discount-row');
+        
+        if (discountRow) discountRow.classList.add('hidden');
+        if (mobileDiscountRow) mobileDiscountRow.classList.add('hidden');
+      }
+    }
+
+    function updatePlanDetails(planDetail) {
+      const planHTML = `
+        <h3 class="plan-name">${planDetail.name}</h3>
+        <p class="plan-description">${planDetail.description}</p>
+      `;
+      
+      const planDetailsEl = document.getElementById('plan-details');
+      const mobilePlanDetailsEl = document.getElementById('mobile-plan-details');
+      
+      if (planDetailsEl) planDetailsEl.innerHTML = planHTML;
+      if (mobilePlanDetailsEl) mobilePlanDetailsEl.innerHTML = planHTML;
+    }
+
+    function setupQuantityControls() {
+      // Quantity controls are disabled in this approach
+      // since we're using direct iframe without JS SDK
+      const quantityInput = document.getElementById('quantity-input');
+      const mobileQuantityInput = document.getElementById('mobile-quantity-input');
+      
+      if (quantityInput) quantityInput.disabled = true;
+      if (mobileQuantityInput) mobileQuantityInput.disabled = true;
+    }
+
+    function setupPlanSwitchButton() {
+      const switchPlanBtn = document.getElementById('switch-plan-btn');
+      const mobileSwitchPlanBtn = document.getElementById('mobile-switch-plan-btn');
+      
+      function switchPlan() {
+        const planDetail = planDetails[currentPlan.toLowerCase()] || planDetails.starter;
+        
+        // Toggle billing cycle
+        isYearly = !isYearly;
+        currentBilling = isYearly ? 'year' : 'month';
+        currentPriceId = isYearly ? planDetail.yearlyPriceId : planDetail.monthlyPriceId;
+        
+        // Update UI
+        updatePlanSwitchButtonText();
+        
+        // Regenerate checkout URL and reload iframe
+        generateCheckoutUrl();
+        loadCheckoutIframe();
+      }
+      
+      function updatePlanSwitchButtonText() {
+        const switchPlanText = document.getElementById('switch-plan-text');
+        const mobileSwitchPlanText = document.getElementById('mobile-switch-plan-text');
+        
+        if (isYearly) {
+          if (switchPlanText) switchPlanText.textContent = 'Switch to Monthly Plan';
+          if (mobileSwitchPlanText) mobileSwitchPlanText.textContent = 'Switch to Monthly Plan';
+        } else {
+          if (switchPlanText) switchPlanText.textContent = 'Switch to Annual Plan';
+          if (mobileSwitchPlanText) mobileSwitchPlanText.textContent = 'Switch to Annual Plan';
+        }
+      }
+      
+      if (switchPlanBtn) {
+        switchPlanBtn.disabled = false;
+        switchPlanBtn.addEventListener('click', switchPlan);
+      }
+      
+      if (mobileSwitchPlanBtn) {
+        mobileSwitchPlanBtn.disabled = false;
+        mobileSwitchPlanBtn.addEventListener('click', switchPlan);
+      }
+      
+      // Initial button text
+      updatePlanSwitchButtonText();
+    }
+
+    function setupMobileAccordion() {
+      const trigger = document.getElementById('mobile-accordion-trigger');
+      const content = document.getElementById('mobile-accordion-content');
+      
+      if (trigger && content) {
+        trigger.addEventListener('click', () => {
+          const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+          trigger.setAttribute('aria-expanded', !isExpanded);
+          content.hidden = isExpanded;
+        });
+      }
+    }
+
+    function setupCouponControls() {
+      const couponInput = document.getElementById('coupon-input');
+      const applyCouponBtn = document.getElementById('apply-coupon-btn');
+      const removeCouponBtn = document.getElementById('remove-coupon-btn');
+      
+      const mobileCouponInput = document.getElementById('mobile-coupon-input');
+      const mobileApplyCouponBtn = document.getElementById('mobile-apply-coupon-btn');
+      const mobileRemoveCouponBtn = document.getElementById('mobile-remove-coupon-btn');
+      
+      // Auto-fill coupon from URL if present
+      if (currentCoupon) {
+        if (couponInput) couponInput.value = currentCoupon;
+        if (mobileCouponInput) mobileCouponInput.value = currentCoupon;
+        updateCouponUI(true, currentCoupon);
+      }
+      
+      function showCouponFeedback(message, type, target = 'both') {
+        const feedbackClasses = {
+          'success': 'coupon-success',
+          'error': 'coupon-error',
+          'info': 'coupon-info'
+        };
+        
+        const icons = {
+          'success': 'fa-check-circle',
+          'error': 'fa-exclamation-circle',
+          'info': 'fa-info-circle'
+        };
+        
+        const feedbackHTML = `
+          <div class="${feedbackClasses[type]}">
+            <i class="fas ${icons[type]}"></i>
+            <span>${message}</span>
+          </div>
+        `;
+        
+        if (target === 'desktop' || target === 'both') {
+          const couponFeedback = document.getElementById('coupon-feedback');
+          if (couponFeedback) couponFeedback.innerHTML = feedbackHTML;
+        }
+        
+        if (target === 'mobile' || target === 'both') {
+          const mobileCouponFeedback = document.getElementById('mobile-coupon-feedback');
+          if (mobileCouponFeedback) mobileCouponFeedback.innerHTML = feedbackHTML;
+        }
+      }
+      
+      function applyCoupon() {
+        const couponCode = (couponInput ? couponInput.value.trim() : '') || (mobileCouponInput ? mobileCouponInput.value.trim() : '');
+        
+        if (!couponCode) {
+          showCouponFeedback('Please enter a coupon code', 'error');
+          return;
+        }
+        
+        currentCoupon = couponCode;
+        updateCouponUI(true, couponCode);
+        showCouponFeedback('Coupon applied. Reloading checkout...', 'info');
+        
+        // Regenerate checkout URL with coupon and reload iframe
+        generateCheckoutUrl();
+        loadCheckoutIframe();
+        
+        // Show success after a delay
+        setTimeout(() => {
+          showCouponFeedback('Discount applied', 'success');
+        }, 1000);
+      }
+      
+      function removeCoupon() {
+        currentCoupon = null;
+        updateCouponUI(false);
+        showCouponFeedback('Coupon removed. Reloading checkout...', 'info');
+        
+        // Regenerate checkout URL without coupon and reload iframe
+        generateCheckoutUrl();
+        loadCheckoutIframe();
+        
+        // Clear feedback after a delay
+        setTimeout(() => {
+          const couponFeedback = document.getElementById('coupon-feedback');
+          const mobileCouponFeedback = document.getElementById('mobile-coupon-feedback');
+          if (couponFeedback) couponFeedback.innerHTML = '';
+          if (mobileCouponFeedback) mobileCouponFeedback.innerHTML = '';
+        }, 1000);
+      }
+      
+      function updateCouponUI(isApplied, couponCode = '') {
+        if (isApplied) {
+          if (couponInput) couponInput.value = couponCode;
+          if (mobileCouponInput) mobileCouponInput.value = couponCode;
+          
+          if (applyCouponBtn) applyCouponBtn.classList.add('hidden');
+          if (mobileApplyCouponBtn) mobileApplyCouponBtn.classList.add('hidden');
+          if (removeCouponBtn) removeCouponBtn.classList.remove('hidden');
+          if (mobileRemoveCouponBtn) mobileRemoveCouponBtn.classList.remove('hidden');
+        } else {
+          if (couponInput) couponInput.value = '';
+          if (mobileCouponInput) mobileCouponInput.value = '';
+          
+          if (applyCouponBtn) applyCouponBtn.classList.remove('hidden');
+          if (mobileApplyCouponBtn) mobileApplyCouponBtn.classList.remove('hidden');
+          if (removeCouponBtn) removeCouponBtn.classList.add('hidden');
+          if (mobileRemoveCouponBtn) mobileRemoveCouponBtn.classList.add('hidden');
+        }
+      }
+      
+      // Event listeners for desktop
+      if (applyCouponBtn) {
+        applyCouponBtn.addEventListener('click', applyCoupon);
+      }
+      
+      if (removeCouponBtn) {
+        removeCouponBtn.addEventListener('click', removeCoupon);
+      }
+      
+      if (couponInput) {
+        couponInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            applyCoupon();
+          }
+        });
+      }
+      
+      // Event listeners for mobile
+      if (mobileApplyCouponBtn) {
+        mobileApplyCouponBtn.addEventListener('click', applyCoupon);
+      }
+      
+      if (mobileRemoveCouponBtn) {
+        mobileRemoveCouponBtn.addEventListener('click', removeCoupon);
+      }
+      
+      if (mobileCouponInput) {
+        mobileCouponInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            applyCoupon();
+          }
+        });
+      }
+    }
+
+    function getTrialDurationText(trialPeriod) {
+      if (!trialPeriod) return '';
+      // Simplified for this example
+      return 'for 7 days';
+    }
+
+    // ========== PREFILL USER DETAILS ==========
+    function getUserDataForCheckout() {
+      const userData = localStorage.getItem('cargolyze_user');
+      if (!userData) return null;
+      
+      try {
+        const user = JSON.parse(userData);
+        return {
+          email: user.email,
+          name: user.name,
+          company: user.company
+        };
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        return null;
+      }
+    }
+
+    // ========== SUCCESS MESSAGE ==========
+    function showSuccessWithCountdown() {
+      console.log('showSuccessWithCountdown called');
+      
+      // Hide everything
+      const loading = document.getElementById('loading');
+      const checkoutContent = document.getElementById('checkout-content');
+      const errorContainer = document.getElementById('error-container');
+      
+      if (loading) loading.classList.add('hidden');
+      if (checkoutContent) checkoutContent.classList.add('hidden');
+      if (errorContainer) errorContainer.innerHTML = '';
+      
+      // Show the overlay
+      const successOverlay = document.getElementById('success-message');
+      if (successOverlay) {
+        successOverlay.classList.remove('hidden');
+      }
+      
+      // Start the countdown
+      startCountdown(100);
+    }
+
+    function startCountdown(seconds) {
+      const countdownElement = document.getElementById('countdown-timer');
+      let countdown = seconds;
+      
+      // Update countdown immediately
+      if (countdownElement) {
+        countdownElement.textContent = countdown;
+      }
+      
+      // Start countdown interval
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        
+        // Update countdown display
+        if (countdownElement) {
+          countdownElement.textContent = countdown;
+        }
+        
+        // Redirect when countdown reaches 0
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          window.location.href = 'download.html';
+        }
+      }, 1000);
+    }
+
+    function showError(message) {
+      const errorContainer = document.getElementById('error-container');
+      if (errorContainer) {
+        errorContainer.innerHTML = `
+          <div class="error-message">
+            <div class="error-title">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>Error</span>
+            </div>
+            <p>${message}</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+              Please contact support at <strong>support@cargolyze.com</strong> if the problem persists.
+            </p>
+          </div>
+        `;
+      }
+    }
+
+    // ========== RESIZE HANDLER ==========
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const newIsMobile = window.innerWidth < 768;
+        if (newIsMobile !== isMobile) {
+          console.log('Screen size changed, reloading checkout iframe...');
+          isMobile = newIsMobile;
+          loadCheckoutIframe();
+        }
+      }, 300);
+    });
+  </script>
+</body>
+</html>
