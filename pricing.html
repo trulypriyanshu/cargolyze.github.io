@@ -847,6 +847,38 @@
         gap: 0.75rem;
       }
     }
+
+    .logged-in {
+      text-decoration: none !important;
+    }
+    
+    .logged-in:hover {
+      text-decoration: none !important;
+    }
+    
+    .mobile-user-icon {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+    
+    .desktop-user-name {
+      text-decoration: none;
+    }
+    
+    @media (max-width: 768px) {
+      .mobile-user-icon {
+        display: block;
+      }
+      
+      .nav-links .logged-in {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -871,8 +903,14 @@
         <a href="index.html#features">Features</a>
         <a href="index.html#carriers">Carriers</a>
         <a href="pricing.html" class="current-nav">Pricing</a>
-        <a href="index.html#interest" class="cta-nav">Get Started</a>
+        <!-- Removed "Get Started" button -->
+        <div id="accountNavContainer"></div>
       </nav>
+
+      <!-- Mobile User Icon (shown only on mobile) -->
+      <button class="mobile-user-icon" id="mobileUserIcon">
+        <i class="fas fa-user"></i>
+      </button>
 
       <!-- Mobile Menu Button -->
       <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -886,7 +924,7 @@
       <a href="index.html#features">Features</a>
       <a href="index.html#carriers">Carriers</a>
       <a href="pricing.html" class="current-nav">Pricing</a>
-      <a href="index.html#interest">Get Started</a>
+      <a href="account.html" id="mobileAccountLink">Account</a>
       <a href="terms.html">Terms of Service</a>
       <a href="privacy.html">Privacy Policy</a>
       <a href="refund.html">Refund Policy</a>
@@ -928,7 +966,7 @@
 
           <div class="price-section">
             <div class="price-display">
-              <div class="price-amount" id="starter-price">$49</div>
+              <div class="price-amount" id="starter-price">₹4,083</div>
             </div>
             <div class="price-period" id="starter-period">per month</div>
             <div class="price-savings" id="starter-savings"></div>
@@ -996,7 +1034,7 @@
 
           <div class="price-section">
             <div class="price-display">
-              <div class="price-amount" id="pro-price">$149</div>
+              <div class="price-amount" id="pro-price">₹12,417</div>
             </div>
             <div class="price-period" id="pro-period">per month</div>
             <div class="price-savings" id="pro-savings"></div>
@@ -1248,7 +1286,7 @@
         </div>
         
         <div class="copyright">
-          &copy; 2025 Cargolyze. All rights reserved. Prices in USD. Payments processed by Paddle.com.
+          &copy; 2025 Cargolyze. All rights reserved. Prices in INR. Payments processed by Paddle.com.
         </div>
       </div>
     </div>
@@ -1265,12 +1303,18 @@
       // Mobile Menu Toggle
       const mobileMenuBtn = document.getElementById('mobileMenuBtn');
       const mobileNav = document.getElementById('mobileNav');
+      const mobileUserIcon = document.getElementById('mobileUserIcon');
       
       mobileMenuBtn.addEventListener('click', function() {
         mobileNav.classList.toggle('active');
         const icon = this.querySelector('i');
         icon.classList.toggle('fa-bars');
         icon.classList.toggle('fa-times');
+      });
+
+      // Mobile User Icon Click - Go to account page
+      mobileUserIcon.addEventListener('click', function() {
+        window.location.href = 'account.html';
       });
 
       // Close mobile menu when clicking outside
@@ -1295,7 +1339,7 @@
       const starterButton = document.getElementById('starter-button');
       const proButton = document.getElementById('pro-button');
 
-      // Price IDs from Paddle
+      // Price IDs from Paddle (Updated for INR)
       const priceIds = {
         month: {
           starter: 'pri_01kde4v2tkqhp8agkh54ewr79t',
@@ -1307,15 +1351,15 @@
         }
       };
 
-      // Default prices (fallback if Paddle fails)
+      // Default prices in INR (fallback if Paddle fails)
       const defaultPrices = {
         month: {
-          starter: 4900, // $49.00 in cents
-          professional: 14900 // $149.00 in cents
+          starter: 4083, // ₹4,083
+          professional: 12417 // ₹12,417
         },
         year: {
-          starter: 3900, // $39.00 in cents (monthly equivalent)
-          professional: 11900 // $119.00 in cents (monthly equivalent)
+          starter: 3266, // ₹3,266 (monthly equivalent)
+          professional: 9934 // ₹9,934 (monthly equivalent)
         }
       };
 
@@ -1379,10 +1423,10 @@
         }
       }
 
-      // Update price display
+      // Update price display (INR formatting)
       function updatePrices(billingCycle, isInitial = false) {
         const isYearly = billingCycle === 'year';
-        const starterPrice = defaultPrices[billingCycle].starter / 100; // Convert to dollars
+        const starterPrice = defaultPrices[billingCycle].starter / 100;
         const proPrice = defaultPrices[billingCycle].professional / 100;
         
         // Calculate savings for annual plans
@@ -1401,13 +1445,18 @@
           proSavings = `Save ${Math.round(proDiscount)}% annually`;
         }
 
+        // Format INR prices with comma separators
+        const formatINR = (amount) => {
+          return `₹${amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+        };
+
         // Update starter plan
-        starterPriceElement.textContent = `₹${starterPrice.toFixed(isYearly ? 0 : 0)}`;
+        starterPriceElement.textContent = formatINR(starterPrice);
         starterPeriodElement.textContent = isYearly ? 'per month, billed annually' : 'per month';
         starterSavingsElement.textContent = starterSavings;
         
         // Update professional plan
-        proPriceElement.textContent = `₹${proPrice.toFixed(isYearly ? 0 : 0)}`;
+        proPriceElement.textContent = formatINR(proPrice);
         proPeriodElement.textContent = isYearly ? 'per month, billed annually' : 'per month';
         proSavingsElement.textContent = proSavings;
 
@@ -1435,14 +1484,55 @@
       proPriceElement.classList.add('price-loading');
       starterPriceElement.textContent = 'Loading...';
       proPriceElement.textContent = 'Loading...';
+      
+      // Setup checkout buttons with subscription check
+      setupCheckoutButtons();
+      // Update navigation based on login status
+      updateNavigationForUser();
     });
 
-// ========== LOGIN CHECK FOR CHECKOUT ==========
+// ========== SUBSCRIPTION CHECK FOR CHECKOUT ==========
+async function checkUserHasSubscription() {
+  try {
+    const userData = localStorage.getItem('cargolyze_user');
+    if (!userData) return false;
+
+    const user = JSON.parse(userData);
+    if (!user.email) return false;
+
+    // Check via API
+    const response = await fetch('https://cargolyze.vercel.app/api/subscription/validate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: user.email })
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.valid && result.subscription) {
+        // Store subscription info locally
+        localStorage.setItem('cargolyze_subscription', JSON.stringify({
+          ...result.subscription,
+          validated_at: new Date().toISOString()
+        }));
+        return true;
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Error checking subscription:', error);
+    return false;
+  }
+}
+
 function setupCheckoutButtons() {
   const checkoutButtons = document.querySelectorAll('.plan-button[data-plan]');
   
   checkoutButtons.forEach(button => {
-    button.addEventListener('click', function(e) {
+    button.addEventListener('click', async function(e) {
       e.preventDefault();
       
       // Check if user is logged in
@@ -1461,12 +1551,23 @@ function setupCheckoutButtons() {
         }));
         
         // Redirect to login page with return URL
-        window.location.href = 'login.html?redirect=checkout';
-        
+        window.location.href = 'login.html?redirect=checkout#login';
         return;
       }
       
-      // User is logged in - proceed to checkout
+      // User is logged in - check if they already have a subscription
+      const hasSubscription = await checkUserHasSubscription();
+      
+      if (hasSubscription) {
+        // User already has a subscription - redirect to account or download page
+        const userConfirmed = confirm('You already have an active subscription. Would you like to go to your account page?');
+        if (userConfirmed) {
+          window.location.href = 'account.html';
+        }
+        return;
+      }
+      
+      // User is logged in and has no subscription - proceed to checkout
       const url = this.href;
       window.location.href = url;
     });
@@ -1476,7 +1577,7 @@ function setupCheckoutButtons() {
 // Also add event listener for the CTA banner button
 const ctaButton = document.querySelector('.cta-banner .cta-button');
 if (ctaButton) {
-  ctaButton.addEventListener('click', function(e) {
+  ctaButton.addEventListener('click', async function(e) {
     e.preventDefault();
     
     const userData = localStorage.getItem('cargolyze_user');
@@ -1493,7 +1594,16 @@ if (ctaButton) {
       return;
     }
     
-    // User logged in - go to plans section
+    // Check if user already has subscription
+    const hasSubscription = await checkUserHasSubscription();
+    
+    if (hasSubscription) {
+      alert('You already have an active subscription. Please visit your account page.');
+      window.location.href = 'account.html';
+      return;
+    }
+    
+    // User logged in and no subscription - go to plans section
     const plansSection = document.querySelector('#plans');
     if (plansSection) {
       plansSection.scrollIntoView({ behavior: 'smooth' });
@@ -1501,22 +1611,24 @@ if (ctaButton) {
   });
 }
 
-// Call this function after DOM loads
-document.addEventListener('DOMContentLoaded', function() {
-  
-  // Add login check for checkout buttons
-  setupCheckoutButtons();
-  
-  // Check URL for redirect parameter
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('redirect') === 'checkout') {
-    // User just logged in - check if they have a checkout intent
-    const checkoutIntent = localStorage.getItem('checkout_intent');
-    if (checkoutIntent) {
-      const intent = JSON.parse(checkoutIntent);
-      
-      // Clear the intent
-      localStorage.removeItem('checkout_intent');
+// Check URL for redirect parameter
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('redirect') === 'checkout') {
+  // User just logged in - check if they have a checkout intent
+  const checkoutIntent = localStorage.getItem('checkout_intent');
+  if (checkoutIntent) {
+    const intent = JSON.parse(checkoutIntent);
+    
+    // Clear the intent
+    localStorage.removeItem('checkout_intent');
+    
+    // Check if user has subscription first
+    checkUserHasSubscription().then(hasSubscription => {
+      if (hasSubscription) {
+        alert('You already have an active subscription. Please visit your account page.');
+        window.location.href = 'account.html';
+        return;
+      }
       
       // Redirect to appropriate plan
       if (intent.plan) {
@@ -1532,12 +1644,9 @@ document.addEventListener('DOMContentLoaded', function() {
       if (plansSection) {
         plansSection.scrollIntoView({ behavior: 'smooth' });
       }
-    }
+    });
   }
-  
-  // Update navigation based on login status
-  updateNavigationForUser();
-});
+}
 
 // ========== USER SESSION MANAGEMENT ==========
 function updateNavigationForUser() {
@@ -1555,12 +1664,6 @@ function updateNavigationForUser() {
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     if (mobileMenuBtn) {
       mobileMenuBtn.parentNode.insertBefore(accountNavContainer, mobileMenuBtn);
-    } else {
-      // Insert at end of nav-links
-      const navLinks = document.querySelector('.nav-links');
-      if (navLinks) {
-        navLinks.appendChild(accountNavContainer);
-      }
     }
   }
   
@@ -1568,9 +1671,9 @@ function updateNavigationForUser() {
     try {
       const user = JSON.parse(userData);
       
-      // Create logged in navigation
+      // Create logged in navigation (without underline)
       accountNavContainer.innerHTML = `
-        <a href="account.html" class="cta-nav logged-in">
+        <a href="account.html" class="cta-nav logged-in desktop-user-name">
           <i class="fas fa-user" style="margin-right: 5px;"></i> ${user.name || 'Account'}
         </a>
       `;
