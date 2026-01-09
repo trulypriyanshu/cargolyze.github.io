@@ -1314,12 +1314,13 @@ function notifyLogin(userData) {
 window.addEventListener('message', function(event) {
     if (event.data === 'userLoggedIn' || event.data === 'userLoggedOut') {
         // Refresh user state
-        //window.location.reload();
+        window.location.reload();
     }
 });
 </script>
 </body>
 
 </html>
+
 
 
