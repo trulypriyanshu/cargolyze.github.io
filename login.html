@@ -1045,7 +1045,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         if (error) throw error;
         
         console.log('✅ Login successful:', data.user.email);
-        showMessage(`Access granted! Loading dashboard...`, 'success');
+        showMessage(`Access granted! Redirecting...`, 'success');
         
         // Get user data from Supabase
         const name = data.user.user_metadata?.full_name || email.split('@')[0];
@@ -1326,6 +1326,7 @@ window.addEventListener('message', function(event) {
 </body>
 
 </html>
+
 
 
 
