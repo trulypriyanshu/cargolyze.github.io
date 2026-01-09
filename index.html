@@ -1385,7 +1385,7 @@
           const user = {
             id: session.user.id,
             email: session.user.email,
-            name: session.user.user_metadata?.name || session.user.email.split('@')[0]
+            name: session.user.user_metadata.full_name.split(' ')[0] || session.user.email.split('@')[0]
           };
           
           localStorage.setItem('cargolyze_user', JSON.stringify(user));
