@@ -1298,6 +1298,11 @@ function handleRedirectAfterLogin() {
   if (redirectParam === 'dashboard') {
     window.location.href = 'dashboard.html';
   }
+
+  // Default redirect to dashboard after login
+  if (redirectParam === null) {
+    window.location.href = 'index.html';
+  }  
 }
 
 // ========== NOTIFY LOGIN FUNCTION ==========
@@ -1314,13 +1319,14 @@ function notifyLogin(userData) {
 window.addEventListener('message', function(event) {
     if (event.data === 'userLoggedIn' || event.data === 'userLoggedOut') {
         // Refresh user state
-        window.location.reload();
+        //window.location.reload();
     }
 });
 </script>
 </body>
 
 </html>
+
 
 
 
