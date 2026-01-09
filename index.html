@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cargolyze - Shipment Tracking Automation</title>
+  <link rel="icon" type="image/png" href="./image/favicon.svg">
+  <link rel="shortcut icon" type="image/png" href="./image/favicon.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    }
+
+    :root {
+      --background: #0a0a0a;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --card-bg-light: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.1);
+      --text-primary: #FFFFFF;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #FF5722;
+      --accent-dark: #E64A19;
+      --accent-light: rgba(255, 87, 34, 0.1);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 20px;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background Effects */
+    .background-base {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .grain-background {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+      z-index: -3;
+    }
+
+    .grid-bg {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -2;
+    }
+
+    .large-blur {
+      background: radial-gradient(circle, rgba(255, 87, 34, 0.15) 0%, transparent 70%);
+      filter: blur(60px);
+      width: 500px;
+      height: 500px;
+      top: -250px;
+      left: -250px;
+      opacity: 0.3;
+    }
+
+    .small-blur {
+      background: radial-gradient(circle, rgba(55, 71, 79, 0.1) 0%, transparent 70%);
+      filter: blur(80px);
+      width: 300px;
+      height: 300px;
+      bottom: -150px;
+      right: -150px;
+      opacity: 0.4;
+    }
+
+    .grain-blur {
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+      filter: blur(100px);
+      width: 100%;
+      height: 100%;
+      opacity: 0.2;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-symbol {
+      width: 48px;
+      height: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Navigation */
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-links a.current-nav {
+      color: var(--accent);
+    }
+
+    .nav-links a.current-nav::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 1px;
+    }
+
+    .cta-nav {
+      background: var(--accent);
+      color: white !important;
+      padding: 0.5rem 1.5rem !important;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease !important;
+    }
+
+    .cta-nav:hover {
+      background: var(--accent-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Mobile Menu */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .mobile-nav {
+      display: none;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding: 1rem 2rem;
+    }
+
+    .mobile-nav.active {
+      display: block;
+    }
+
+    .mobile-nav a {
+      display: block;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.75rem 0;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .mobile-nav a:last-child {
+      border-bottom: none;
+    }
+
+    .mobile-nav a.current-nav {
+      color: var(--accent);
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 8rem 0 6rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      padding: 4rem 0;
+      position: relative;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 2rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-item:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .stat-item h3 {
+      font-size: 2.5rem;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-item p {
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    /* USP Sections */
+    .usp-section {
+      padding: 6rem 0;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 1.5px;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+      max-width: 600px;
+      margin: 0 auto 4rem;
+      line-height: 1.6;
+    }
+
+    /* USP Grid */
+    .usp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+
+    .usp-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .usp-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent);
+    }
+
+    .usp-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .usp-icon {
+      width: 60px;
+      height: 60px;
+      background: var(--accent-light);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      color: var(--accent);
+      font-size: 1.5rem;
+    }
+
+    .usp-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .usp-card p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .usp-feature-list {
+      list-style: none;
+      margin-top: 1.5rem;
+    }
+
+    .usp-feature-list li {
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .usp-feature-list li i {
+      color: var(--accent);
+      margin-top: 0.25rem;
+    }
+
+    /* How It Works Section */
+    .how-it-works-section {
+      padding: 6rem 0;
+      position: relative;
+      background: linear-gradient(180deg, rgba(10, 10, 10, 0.8) 0%, rgba(255, 87, 34, 0.05) 100%);
+    }
+
+    .process-steps {
+      max-width: 1000px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .process-steps::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--accent), transparent 90%);
+    }
+
+    .process-step {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4rem;
+      position: relative;
+    }
+
+    .process-step:nth-child(odd) {
+      flex-direction: row;
+    }
+
+    .process-step:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .step-number {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -400%);
+      width: 50px;
+      height: 50px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.25rem;
+      z-index: 1;
+      border: 4px solid var(--background);
+    }
+
+    .step-content {
+      flex: 1;
+      padding: 2rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin: 0 2rem;
+    }
+
+    .process-step:nth-child(odd) .step-content {
+      margin-left: 0;
+      margin-right: 4rem;
+    }
+
+    .process-step:nth-child(even) .step-content {
+      margin-right: 0;
+      margin-left: 4rem;
+    }
+
+    .step-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--accent-light);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .step-description {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .step-details {
+      list-style: none;
+      margin-top: 1.5rem;
+    }
+
+    .step-details li {
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .step-details li i {
+      color: var(--accent);
+      margin-top: 0.25rem;
+    }
+
+    .tech-stack {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .tech-tag {
+      background: rgba(255, 87, 34, 0.1);
+      color: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 87, 34, 0.3);
+    }
+
+    /* Carriers Section */
+    .carriers-section {
+      padding: 6rem 0;
+      background: var(--card-bg);
+    }
+
+    .carriers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .carrier-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .carrier-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      background: rgba(255, 87, 34, 0.05);
+    }
+
+    .carrier-icon {
+      font-size: 2.5rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .carrier-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      padding: 6rem 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 87, 34, 0.1) 0%, rgba(55, 71, 79, 0.1) 100%);
+      z-index: -1;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-section p {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.6;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 1.125rem;
+      transition: all 0.3s ease;
+    }
+
+    .cta-button:hover {
+      background: var(--accent-dark);
+      transform: translateY(-2px);
+    }
+
+    .cta-button.secondary {
+      background: transparent;
+      border: 2px solid var(--accent);
+      margin-left: 1rem;
+    }
+
+    .cta-button.secondary:hover {
+      background: var(--accent-light);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 0 1.5rem;
+    }
+
+    .footer-content {
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-tagline {
+      color: var(--accent);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    .footer-legal {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-legal a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-legal a:hover {
+      color: var(--text-secondary);
+    }
+
+    .copyright {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 1.5rem;
+      opacity: 0.8;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .nav-container {
+        padding: 1rem;
+      }
+
+      .container {
+        padding: 0 1rem;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1.125rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .usp-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .process-steps::before {
+        left: 30px;
+      }
+
+      .process-step {
+        flex-direction: column !important;
+        margin-bottom: 3rem;
+      }
+
+      .step-number {
+        left: 30px;
+        transform: translateX(0);
+      }
+
+      .step-content {
+        margin: 2rem 0 0 0 !important;
+        width: 100%;
+      }
+
+      .carriers-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .footer-links {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .footer-legal {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .cta-button.secondary {
+        margin-left: 0;
+        margin-top: 1rem;
+      }
+    }
+
+    /* Button Group */
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .mobile-user-icon {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-user-icon {
+        display: block;
+      }
+      
+      .nav-links .cta-nav {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Background Effects -->
+  <div class="background-base grain-blur"></div>
+  <div class="background-base grain-background"></div>
+  <div class="background-base grid-bg"></div>
+  <div class="background-base large-blur"></div>
+  <div class="background-base small-blur"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <div class="logo-symbol">
+			<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 		   viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve">
+			   <style type="text/css">
+			   .st0{fill:#FFFFFF;}
+			   .st1{fill:#FF5722;}
+			</style>
+			<g>
+			   <g>
+			      <polygon class="st0" points="17.74,6.46 0.04,6.46 0.04,17.54 17.74,17.54 12.21,12"/>
+			      <rect x="17.74" y="6.46" class="st0" width="0.01" height="11.07"/>
+			      <polygon class="st1" points="12.21,12 17.74,17.54 17.74,6.46"/>
+			  </g>
+			  <rect x="19.53" y="9.79" class="st1" width="4.43" height="4.43"/>
+		      </g>
+		      </svg>
+        </div>
+        <span>CARGOLYZE</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="nav-links">
+        <a href="index.html" class="current-nav">Home</a>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#carriers">Carriers</a>
+        <a href="pricing.html">Pricing</a>
+        <div id="accountNavContainer">
+          <a href="account.html" class="cta-nav" id="accountLink">
+            <i class="fas fa-user" style="margin-right: 5px;"></i> Sign Up
+          </a>
+        </div>
+      </nav>
+
+      <!-- Mobile User Icon (shown only on mobile) -->
+      <button class="mobile-user-icon" id="mobileUserIcon">
+        <i class="fas fa-user"></i>
+      </button>
+
+      <!-- Mobile Menu Button -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobileNav">
+      <a href="index.html" class="current-nav">Home</a>
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#carriers">Carriers</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="account.html" id="mobileAccountLink">Account</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <h1>Intelligent Shipment Tracking & Analytics</h1>
+      <p>Advanced desktop application providing shipment tracking automation solution with accurate ETAs, port details, and transit time calculations.</p>
+      <div class="button-group">
+        <a href="pricing.html" class="cta-button">View Pricing Plans</a>
+        <a href="#how-it-works" class="cta-button secondary">See How It Works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <h3>5+</h3>
+          <p>Carrier Integrations</p>
+        </div>
+        <div class="stat-item">
+          <h3>99%</h3>
+          <p>Tracking Accuracy</p>
+        </div>
+        <div class="stat-item">
+          <h3>24/7*</h3>
+          <p>Technical Support</p>
+        </div>
+        <div class="stat-item">
+          <h3>95%</h3>
+          <p>Customer Satisfaction</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USP: Automatic Scraping -->
+  <section class="usp-section" id="features">
+    <div class="container">
+      <h2 class="section-title">Automatic Data Scraping</h2>
+      <p class="section-subtitle">Our intelligent scraping technology extracts shipping information automatically from multiple sources</p>
+      
+      <div class="usp-grid">
+        <div class="usp-card">
+          <div class="usp-icon">
+            <i class="fas fa-robot"></i>
+          </div>
+          <h3>Smart Automation</h3>
+          <p>Automatically scrapes and processes shipping data from carrier websites, eliminating manual data entry.</p>
+          <ul class="usp-feature-list">
+            <li><i class="fas fa-check"></i> Real-time tracking updates</li>
+            <li><i class="fas fa-check"></i> Automatic ETA calculations</li>
+            <li><i class="fas fa-check"></i> Port congestion monitoring</li>
+            <li><i class="fas fa-check"></i> Weather delay predictions</li>
+          </ul>
+        </div>
+
+        <div class="usp-card">
+          <div class="usp-icon">
+            <i class="fas fa-database"></i>
+          </div>
+          <h3>You Keep the Data, We Keep Statistics</h3>
+          <p>Your shipment data belongs to you. We only use anonymized statistics to improve our algorithms.</p>
+          <ul class="usp-feature-list">
+            <li><i class="fas fa-check"></i> Complete data ownership</li>
+            <li><i class="fas fa-check"></i> GDPR compliant</li>
+            <li><i class="fas fa-check"></i> End-to-end encryption</li>
+            <li><i class="fas fa-check"></i> Regular data exports</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USP: Cost Efficient -->
+  <section class="usp-section">
+    <div class="container">
+      <h2 class="section-title">Cost Efficient for SMEs</h2>
+      <p class="section-subtitle">Professional logistics automation at prices designed for growing businesses</p>
+      
+      <div class="usp-grid">
+        <div class="usp-card">
+          <div class="usp-icon">
+            <i class="fas fa-rupee-sign"></i>
+          </div>
+          <h3>Affordable Plans</h3>
+          <p>Starting at just ₹4,083/month, get enterprise-grade tracking without the enterprise price tag.</p>
+          <ul class="usp-feature-list">
+            <li><i class="fas fa-check"></i> No setup fees</li>
+            <li><i class="fas fa-check"></i> Cancel anytime</li>
+            <li><i class="fas fa-check"></i> Volume discounts available</li>
+            <li><i class="fas fa-check"></i> Free 14-day trial</li>
+          </ul>
+        </div>
+
+        <div class="usp-card">
+          <div class="usp-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3>ROI Focused</h3>
+          <p>Reduce manual tracking hours by 80% and improve supply chain efficiency with our cost-effective solution.</p>
+          <ul class="usp-feature-list">
+            <li><i class="fas fa-check"></i> Save 20+ hours monthly</li>
+            <li><i class="fas fa-check"></i> Reduce operational costs</li>
+            <li><i class="fas fa-check"></i> Improve delivery accuracy</li>
+            <li><i class="fas fa-check"></i> Scale with your business</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USP: Multiple Carriers -->
+  <section class="usp-section">
+    <div class="container">
+      <h2 class="section-title">Multiple Shipping Lines, One Platform</h2>
+      <p class="section-subtitle">Track all your shipments across different carriers from a single dashboard</p>
+      
+      <div class="usp-grid">
+        <div class="usp-card">
+          <div class="usp-icon">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <h3>Unified Tracking</h3>
+          <p>Consolidate tracking from multiple carriers into one intuitive interface. No more switching between tabs.</p>
+          <ul class="usp-feature-list">
+            <li><i class="fas fa-check"></i> Single dashboard view</li>
+            <li><i class="fas fa-check"></i> Carrier performance comparison</li>
+            <li><i class="fas fa-check"></i> Batch tracking updates</li>
+            <li><i class="fas fa-check"></i> Custom alerts per carrier</li>
+          </ul>
+        </div>
+
+        <div class="usp-card">
+          <div class="usp-icon">
+            <i class="fas fa-file-excel"></i>
+          </div>
+          <h3>Export to Excel</h3>
+          <p>Seamlessly export your tracking data to Excel for custom analysis, reporting, and sharing.</p>
+          <ul class="usp-feature-list">
+            <li><i class="fas fa-check"></i> One-click Excel exports</li>
+            <li><i class="fas fa-check"></i> Custom column selection</li>
+            <li><i class="fas fa-check"></i> Scheduled reports</li>
+            <li><i class="fas fa-check"></i> Template support</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works-section" id="how-it-works">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-subtitle">Automated tracking process that handles everything from Excel upload to data extraction and export</p>
+      
+      <div class="process-steps">
+        <!-- Step 1: Upload Excel File -->
+        <div class="process-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">
+              <div class="step-icon">
+                <i class="fas fa-file-upload"></i>
+              </div>
+              <span>Upload Excel File</span>
+            </div>
+            <p class="step-description">Upload your Excel file containing BL numbers and carrier names. Our system automatically reads and processes the data.</p>
+            <ul class="step-details">
+              <li><i class="fas fa-check"></i> Supports .xlsx and .xls formats</li>
+              <li><i class="fas fa-check"></i> Automatic column detection</li>
+              <li><i class="fas fa-check"></i> Data validation and error checking</li>
+              <li><i class="fas fa-check"></i> Secure file processing</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Step 2: Data Processing -->
+        <div class="process-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">
+              <div class="step-icon">
+                <i class="fas fa-cogs"></i>
+              </div>
+              <span>Data Processing & Categorization</span>
+            </div>
+            <p class="step-description">The application reads the Excel file and intelligently categorizes data by shipping line for efficient processing.</p>
+            <ul class="step-details">
+              <li><i class="fas fa-check"></i> Groups BL numbers by carrier</li>
+              <li><i class="fas fa-check"></i> Validates carrier compatibility</li>
+              <li><i class="fas fa-check"></i> Creates optimized processing queues</li>
+              <li><i class="fas fa-check"></i> Handles duplicate entries</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Step 3: Automated Web Scraping -->
+        <div class="process-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">
+              <div class="step-icon">
+                <i class="fas fa-spider"></i>
+              </div>
+              <span>Automated Web Scraping</span>
+            </div>
+            <p class="step-description">Our system initializes Chrome browser with Selenium and navigates to each carrier's tracking page automatically.</p>
+            <ul class="step-details">
+              <li><i class="fas fa-check"></i> Automated browser initialization</li>
+              <li><i class="fas fa-check"></i> Carrier-specific navigation logic</li>
+              <li><i class="fas fa-check"></i> Intelligent waiting for page loads</li>
+              <li><i class="fas fa-check"></i> Captcha handling when required</li>
+            </ul>
+            <div class="tech-stack">
+              <span class="tech-tag">Selenium</span>
+              <span class="tech-tag">Chrome Driver</span>
+              <span class="tech-tag">Python Automation</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Data Extraction -->
+        <div class="process-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">
+              <div class="step-icon">
+                <i class="fas fa-search"></i>
+              </div>
+              <span>Real-time Data Extraction</span>
+            </div>
+            <p class="step-description">For each BL number, the system searches the carrier's tracking page and extracts shipment status, location, and ETA.</p>
+            <ul class="step-details">
+              <li><i class="fas fa-check"></i> Sequential BL number processing</li>
+              <li><i class="fas fa-check"></i> Real-time status extraction</li>
+              <li><i class="fas fa-check"></i> Transit time calculation</li>
+              <li><i class="fas fa-check"></i> Error handling and retry logic</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Step 5: Carrier Processing -->
+        <div class="process-step">
+          <div class="step-number">5</div>
+          <div class="step-content">
+            <div class="step-title">
+              <div class="step-icon">
+                <i class="fas fa-ship"></i>
+              </div>
+              <span>Batch Processing by Carrier</span>
+            </div>
+            <p class="step-description">Complete all BL numbers for one shipping line before moving to the next, ensuring efficient resource usage.</p>
+            <ul class="step-details">
+              <li><i class="fas fa-check"></i> Processes all BLs per carrier in batch</li>
+              <li><i class="fas fa-check"></i> Cleans browser session between carriers</li>
+              <li><i class="fas fa-check"></i> Maintains data integrity</li>
+              <li><i class="fas fa-check"></i> Progress tracking per carrier</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Step 6: Data Compilation -->
+        <div class="process-step">
+          <div class="step-number">6</div>
+          <div class="step-content">
+            <div class="step-title">
+              <div class="step-icon">
+                <i class="fas fa-file-export"></i>
+              </div>
+              <span>Data Compilation & Export</span>
+            </div>
+            <p class="step-description">After completing all shipping lines, the application compiles all extracted data and saves it back to Excel format.</p>
+            <ul class="step-details">
+              <li><i class="fas fa-check"></i> Consolidates all extracted data</li>
+              <li><i class="fas fa-check"></i> Calculates transit times and ETAs</li>
+              <li><i class="fas fa-check"></i> Formats data for Excel export</li>
+              <li><i class="fas fa-check"></i> Creates detailed tracking report</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Supported Carriers -->
+  <section class="carriers-section" id="carriers">
+    <div class="container">
+      <h2 class="section-title">Integrated Carriers</h2>
+      <p class="section-subtitle">Track shipments across all major shipping lines with our comprehensive carrier integration</p>
+      
+      <div class="carriers-grid">
+        <div class="carrier-card">
+          <div class="carrier-icon">
+            <i class="fas fa-ship"></i>
+          </div>
+          <div class="carrier-name">CMA CGM</div>
+        </div>
+        <div class="carrier-card">
+          <div class="carrier-icon">
+            <i class="fas fa-ship"></i>
+          </div>
+          <div class="carrier-name">Maersk</div>
+        </div>
+        <div class="carrier-card">
+          <div class="carrier-icon">
+            <i class="fas fa-ship"></i>
+          </div>
+          <div class="carrier-name">MSC</div>
+        </div>
+        <div class="carrier-card">
+          <div class="carrier-icon">
+            <i class="fas fa-ship"></i>
+          </div>
+          <div class="carrier-name">Hapag-Lloyd</div>
+        </div>
+        <div class="carrier-card">
+          <div class="carrier-icon">
+            <i class="fas fa-ship"></i>
+          </div>
+          <div class="carrier-name">PIL</div>
+        </div>
+        <div class="carrier-card">
+          <div class="carrier-icon">
+            <i class="fas fa-plus"></i>
+          </div>
+          <div class="carrier-name">More Coming Soon</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Ready to Automate Your Shipment Tracking?</h2>
+      <p>Experience the power of automated tracking with our 14-day free trial. No credit card required.</p>
+      <div class="button-group">
+        <a href="pricing.html" class="cta-button">Start Free Trial</a>
+        <a href="#how-it-works" class="cta-button secondary">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">CARGOLYZE</div>
+        <div class="footer-tagline">SHIPMENT TRACKING AUTOMATION</div>
+        
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#carriers">Carriers</a>
+          <a href="pricing.html">Pricing</a>
+        </div>
+        
+        <div class="footer-legal">
+          <a href="terms.html">Terms of Service</a>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="refund.html">Refund Policy</a>
+          <a href="mailto:support@cargolyze.com">Support</a>
+        </div>
+        
+        <div class="copyright">
+          &copy; 2025 Cargolyze. All rights reserved.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Supabase
+    const supabaseUrl = CONFIG.SUPABASE_URL;
+    const supabaseAnonKey = CONFIG.SUPABASE_ANON_KEY;
+    
+    supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseAnonKey) : null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Mobile Menu Toggle
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileNav = document.getElementById('mobileNav');
+      const mobileUserIcon = document.getElementById('mobileUserIcon');
+      
+      mobileMenuBtn.addEventListener('click', function() {
+        mobileNav.classList.toggle('active');
+        const icon = this.querySelector('i');
+        icon.classList.toggle('fa-bars');
+        icon.classList.toggle('fa-times');
+      });
+
+      // Mobile User Icon Click
+      mobileUserIcon.addEventListener('click', function() {
+        window.location.href = 'account.html';
+      });
+
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', function(event) {
+        if (!mobileNav.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+          mobileNav.classList.remove('active');
+          const icon = mobileMenuBtn.querySelector('i');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          const href = this.getAttribute('href');
+          
+          if (href === '#') return;
+                    
+          // Close mobile menu if open
+          if (mobileNav.classList.contains('active')) {
+            mobileNav.classList.remove('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+          }
+          
+          const targetId = href.substring(1);
+          
+          // If it's home link, scroll to top
+          if (targetId === 'home') {
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+            return;
+          }
+          
+          const targetElement = document.getElementById(targetId);
+          
+          if (targetElement) {
+            e.preventDefault();
+            const headerHeight = document.querySelector('header').offsetHeight;
+            const offset = headerHeight + 20;
+            
+            const elementPosition = targetElement.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+            
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+
+      // Check user session and update navigation
+      checkUserSession();
+      
+      // Listen for storage events
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'cargolyze_user' || e.key === 'cargolyze_logout_event') {
+          updateNavigationForUser();
+        }
+      });
+      
+      // Listen for message events
+      window.addEventListener('message', function(e) {
+        if (e.data === 'userLoggedIn' || e.data === 'userLoggedOut') {
+          checkUserSession();
+        }
+      });
+    });
+
+    // Check user session with Supabase
+    async function checkUserSession() {
+      if (!supabase) return;
+      
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+          updateNavigationForUser(null);
+          return;
+        }
+        
+        if (session) {
+          const user = {
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata?.name || session.user.email.split('@')[0]
+          };
+          
+          localStorage.setItem('cargolyze_user', JSON.stringify(user));
+          updateNavigationForUser(user);
+        } else {
+          localStorage.removeItem('cargolyze_user');
+          updateNavigationForUser(null);
+        }
+      } catch (error) {
+        console.error('Session check failed:', error);
+        updateNavigationForUser(null);
+      }
+    }
+
+    // Update navigation based on user status
+    function updateNavigationForUser(user) {
+      const accountNavContainer = document.getElementById('accountNavContainer');
+      const mobileAccountLink = document.getElementById('mobileAccountLink');
+      const accountLink = document.getElementById('accountLink');
+      const mobileUserIcon = document.getElementById('mobileUserIcon');
+      
+      if (user) {
+        // User is logged in
+        if (accountNavContainer) {
+          accountNavContainer.innerHTML = `
+            <a href="account.html" class="cta-nav">
+              <i class="fas fa-user" style="margin-right: 5px;"></i> ${user.name}
+            </a>
+          `;
+        }
+        
+        if (mobileAccountLink) {
+          mobileAccountLink.textContent = 'Account';
+          mobileAccountLink.href = 'account.html';
+        }
+        
+        if (mobileUserIcon) {
+          mobileUserIcon.innerHTML = '<i class="fas fa-user-check"></i>';
+        }
+      } else {
+        // User is not logged in
+        if (accountNavContainer) {
+          accountNavContainer.innerHTML = `
+            <a href="login.html" class="cta-nav" id="accountLink">
+              <i class="fas fa-user" style="margin-right: 5px;"></i> Sign Up
+            </a>
+          `;
+        }
+        
+        if (mobileAccountLink) {
+          mobileAccountLink.textContent = 'Sign Up';
+          mobileAccountLink.href = 'login.html';
+        }
+        
+        if (mobileUserIcon) {
+          mobileUserIcon.innerHTML = '<i class="fas fa-user"></i>';
+        }
+      }
+    }
+
+    // Auto-login check from URL parameters (for OAuth redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    const accessToken = urlParams.get('access_token');
+    const refreshToken = urlParams.get('refresh_token');
+    
+    if (accessToken && refreshToken && supabase) {
+      // Set the session from URL parameters
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      }).then(() => {
+        // Remove tokens from URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        // Refresh page to update navigation
+        window.location.reload();
+      });
+    }
+  </script>
+</body>
+</html>
